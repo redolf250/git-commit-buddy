@@ -2,9 +2,24 @@ import os
 import json
 from PyQt5 import uic
 from pathlib import Path
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QFileDialog, QDialog, QGraphicsDropShadowEffect
+
+
+class APIKEY(QDialog):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("./views/api_key_dialog.ui", self)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.btnClose.clicked.connect(self.close)
+        self.shadow = QGraphicsDropShadowEffect(self)
+        self.shadow.setBlurRadius(20)
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.shadow.setColor(QColor(230, 230, 230, 50))
+        self.setGraphicsEffect(self.shadow)
 
 
 class MainWindow(QMainWindow):
@@ -24,18 +39,13 @@ class MainWindow(QMainWindow):
         self.btnClose.clicked.connect(self.close)
         self.btnMinimize.clicked.connect(self.showMinimized)
 
-        self.btnHome.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.homePage)
-        )
         self.btnCommit.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.commitPage)
         )
         self.btnPullRequest.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.pullRequestPage)
         )
-        self.btnSettings.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.settingsPage)
-        )
+        self.btnSettings.clicked.connect(self.open_dialog)
 
         self.btnBrowse.clicked.connect(self.browseProjectFolder)
 
@@ -45,6 +55,10 @@ class MainWindow(QMainWindow):
         self.setExtentionsFont()
 
         self.projectsComboBox.currentIndexChanged.connect(self.on_combo_box_changed)
+
+    def open_dialog(self):
+        self.dialog = APIKEY()
+        self.dialog.show()
 
     def setExtentionsFont(self):
         font = QFont()
@@ -93,7 +107,19 @@ class MainWindow(QMainWindow):
             os.makedirs(root_dir)
             json_path = os.path.join(root_dir, "projects.json")
             json_path = Path(json_path)
+            json_api = os.path.join(root_dir, "apiKey.json")
+            json_api = Path(json_api)
+            json_api.touch(exist_ok=True)
             json_path.touch(exist_ok=True)
+
+    def apiKeyPath(self):
+        # Determine root directory based on OS
+        if os.name == "nt":  # For Windows
+            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
+        else:  # For Unix-based systems (Linux/macOS)
+            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
+        json_path = Path(root_dir) / "apiKey.json"
+        return json_path
 
     def projectsJson(self):
         # Determine root directory based on OS
@@ -179,6 +205,7 @@ class MainWindow(QMainWindow):
             selected_item = self.projectsComboBox.currentText()
             item = self.get_item_by_key(selected_item)
             self.projectPath.setText(item['path'])
+            self.projectKey.setText(selected_item)
             self.fileExtentionsTextEdit.append(item['extensions'])
         except Exception as e:
             print(f'An exception occurred: {str(e)}')

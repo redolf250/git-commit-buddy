@@ -312,216 +312,6 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QFrame" name="topMenu">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>250</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>300</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="btnHome">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton{
-	color: rgb(255, 255, 255);
-	border:none;
-}
-
-QPushButton:hover{
-	border-left: 3px solid rgb(255,255,255);
-}
-
-
- QPushButton:focus{
-    color: rgb(255, 255, 255);
-    border-left: 2px solid rgb(255,255,255);	
-  }</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>../resources/assert/home.svg</normaloff>../resources/assert/home.svg</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>30</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="autoDefault">
-                <bool>false</bool>
-               </property>
-               <property name="flat">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnCommit">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton{
-	color: rgb(255, 255, 255);
-	border:none;
-}
-
-QPushButton:hover{
-	border-left: 3px solid rgb(255,255,255);
-}
-
-
- QPushButton:focus{
-    color: rgb(255, 255, 255);
-    border-left: 2px solid rgb(255,255,255);	
-  }</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>../resources/assert/git-commit.svg</normaloff>../resources/assert/git-commit.svg</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>30</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="flat">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnPullRequest">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton{
-	color: rgb(255, 255, 255);
-	border:none;
-}
-
-QPushButton:hover{
-	border-left: 3px solid rgb(255,255,255);
-}
-
-
- QPushButton:focus{
-    color: rgb(255, 255, 255);
-    border-left: 2px solid rgb(255,255,255);	
-  }</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>../resources/assert/git-pull-request.svg</normaloff>../resources/assert/git-pull-request.svg</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>30</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="flat">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_4">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QPushButton{
-	color: rgb(255, 255, 255);
-	border:none;
-}
-
-QPushButton:hover{
-	border-left: 3px solid rgb(255,255,255);
-}
-
-
- QPushButton:focus{
-    color: rgb(255, 255, 255);
-    border-left: 2px solid rgb(255,255,255);	
-  }</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset>
-                 <normaloff>../resources/assert/layers.svg</normaloff>../resources/assert/layers.svg</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>30</width>
-                 <height>30</height>
-                </size>
-               </property>
-               <property name="flat">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
            <widget class="QFrame" name="bottomMenu">
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -533,7 +323,7 @@ QPushButton:hover{
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>410</y>
+               <y>710</y>
                <width>55</width>
                <height>60</height>
               </rect>
@@ -576,6 +366,135 @@ QPushButton:hover{
              <property name="flat">
               <bool>true</bool>
              </property>
+            </widget>
+            <widget class="QFrame" name="topMenu">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>55</width>
+               <height>160</height>
+              </rect>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>160</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>80</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="btnCommit">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	border:none;
+}
+
+QPushButton:hover{
+	border-left: 3px solid rgb(255,255,255);
+}
+
+
+ QPushButton:focus{
+    color: rgb(255, 255, 255);
+    border-left: 2px solid rgb(255,255,255);	
+  }</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/assert/git-commit.svg</normaloff>../resources/assert/git-commit.svg</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnPullRequest">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	border:none;
+}
+
+QPushButton:hover{
+	border-left: 3px solid rgb(255,255,255);
+}
+
+
+ QPushButton:focus{
+    color: rgb(255, 255, 255);
+    border-left: 2px solid rgb(255,255,255);	
+  }</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>../resources/assert/git-pull-request.svg</normaloff>../resources/assert/git-pull-request.svg</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -647,7 +566,9 @@ QPushButton:hover{
                  <height>742</height>
                 </size>
                </property>
-               <widget class="QWidget" name="homePage"/>
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
                <widget class="QWidget" name="commitPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <property name="spacing">
@@ -1102,6 +1023,7 @@ p, li { white-space: pre-wrap; }
                </widget>
                <widget class="QWidget" name="pullRequestPage"/>
                <widget class="QWidget" name="settingsPage"/>
+               <widget class="QWidget" name="homePage"/>
               </widget>
              </item>
             </layout>
