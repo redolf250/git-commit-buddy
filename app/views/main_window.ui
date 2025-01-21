@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1019</width>
-    <height>817</height>
+    <width>1001</width>
+    <height>823</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -274,6 +274,12 @@
        </property>
        <item>
         <widget class="QFrame" name="leftMenu">
+         <property name="minimumSize">
+          <size>
+           <width>55</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>55</width>
@@ -342,7 +348,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="btnHome">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -387,7 +393,7 @@ QPushButton:hover{
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="btnCommit">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -429,7 +435,7 @@ QPushButton:hover{
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_3">
+              <widget class="QPushButton" name="btnPullRequest">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -523,6 +529,54 @@ QPushButton:hover{
             <property name="frameShadow">
              <enum>QFrame::Plain</enum>
             </property>
+            <widget class="QPushButton" name="btnSettings">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>410</y>
+               <width>55</width>
+               <height>60</height>
+              </rect>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	border:none;
+}
+
+QPushButton:hover{
+	border-left: 3px solid rgb(255,255,255);
+}
+
+
+ QPushButton:focus{
+    color: rgb(255, 255, 255);
+    border-left: 2px solid rgb(255,255,255);	
+  }</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>../resources/assert/settings.svg</normaloff>../resources/assert/settings.svg</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>30</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -563,10 +617,504 @@ QPushButton:hover{
             <property name="frameShadow">
              <enum>QFrame::Plain</enum>
             </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QStackedWidget" name="stackedWidget">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>742</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>742</height>
+                </size>
+               </property>
+               <widget class="QWidget" name="homePage"/>
+               <widget class="QWidget" name="commitPage">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QFrame" name="frame_3">
+                   <property name="minimumSize">
+                    <size>
+                     <width>300</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>250</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Plain</enum>
+                   </property>
+                   <widget class="QLineEdit" name="issueKeyLineEdit">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>80</y>
+                      <width>171</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLineEdit{
+color: rgb(255, 255, 255);
+padding-left: 5px;
+border-radius: 5px;
+border: 2px solid rgb(255,255,255);	
+}
+</string>
+                    </property>
+                    <property name="placeholderText">
+                     <string>Issue Key (Optional)</string>
+                    </property>
+                    <property name="clearButtonEnabled">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QComboBox" name="projectsComboBox">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>10</y>
+                      <width>281</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>15</pointsize>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QComboBox{
+color: rgb(255, 255, 255);
+padding-left: 5px;
+border-radius: 5px;
+border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="editable">
+                     <bool>false</bool>
+                    </property>
+                    <property name="placeholderText">
+                     <string notr="true">Select Project</string>
+                    </property>
+                    <property name="frame">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QLineEdit" name="commitMessageLenghtEdit">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>150</y>
+                      <width>141</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
+                    <property name="toolTip">
+                     <string extracomment="Commit message length. default 10."/>
+                    </property>
+                    <property name="toolTipDuration">
+                     <number>6</number>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLineEdit{
+color: rgb(255, 255, 255);
+padding-left: 5px;
+border-radius: 5px;
+border: 2px solid rgb(255,255,255);	
+}
+</string>
+                    </property>
+                    <property name="placeholderText">
+                     <string>Message Length </string>
+                    </property>
+                    <property name="clearButtonEnabled">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnBrowse">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>240</y>
+                      <width>281</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>New Project Repository</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/folder.svg</normaloff>../resources/assert/folder.svg</iconset>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QTextEdit" name="fileExtentionsTextEdit">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>450</y>
+                      <width>281</width>
+                      <height>281</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>15</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">color: rgb(255, 255, 255);
+border-radius: 5px;
+border: 2px solid rgb(255,255,255);	</string>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Plain</enum>
+                    </property>
+                    <property name="html">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Baskerville Old Face'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="placeholderText">
+                     <string>Enter file extentions here, should be comma seperated. eg c,cpp and etc</string>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnSaveProjectConfiguration">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>380</y>
+                      <width>281</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Save Project</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/save.svg</normaloff>../resources/assert/save.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QLineEdit" name="projectKey">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>310</y>
+                      <width>281</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
+                    <property name="toolTip">
+                     <string extracomment="Commit message length. default 10."/>
+                    </property>
+                    <property name="toolTipDuration">
+                     <number>6</number>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLineEdit{
+color: rgb(255, 255, 255);
+padding-left: 5px;
+border-radius: 5px;
+border: 2px solid rgb(255,255,255);	
+}
+</string>
+                    </property>
+                    <property name="placeholderText">
+                     <string>Project Key (Unique)</string>
+                    </property>
+                    <property name="clearButtonEnabled">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnGenerateCommit">
+                    <property name="geometry">
+                     <rect>
+                      <x>160</x>
+                      <y>150</y>
+                      <width>131</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Generate</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/send.svg</normaloff>../resources/assert/send.svg</iconset>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnRemoveProject">
+                    <property name="geometry">
+                     <rect>
+                      <x>190</x>
+                      <y>80</y>
+                      <width>101</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Remove</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/minus.svg</normaloff>../resources/assert/minus.svg</iconset>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_4">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Plain</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_6">
+                    <item>
+                     <widget class="QLabel" name="projectPath">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Baskerville Old Face</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(66, 66, 66);
+padding-left: 2px;
+border-radius: 5px;</string>
+                      </property>
+                      <property name="text">
+                       <string>Project Path</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QTextEdit" name="textEdit">
+                      <property name="styleSheet">
+                       <string notr="true">color: rgb(255, 255, 255);</string>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
+                      <property name="html">
+                       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Hello World&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="pullRequestPage"/>
+               <widget class="QWidget" name="settingsPage"/>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
            <widget class="QFrame" name="frame_2">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
