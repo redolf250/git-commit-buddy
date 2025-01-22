@@ -14,9 +14,6 @@ from PyQt5.QtWidgets import (
 )
 
 
-extensions = [".cs", ".cshtml"]
-
-
 class APIKEY(QDialog):
     def __init__(self):
         super().__init__()
