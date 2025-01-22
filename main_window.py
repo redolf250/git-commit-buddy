@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
 )
 
 
-class APIKEY(QDialog):
+class SettingsDialog(QDialog):
     def __init__(self):
         super().__init__()
         uic.loadUi("./views/api_key_dialog.ui", self)
@@ -31,6 +31,7 @@ class APIKEY(QDialog):
         self.mouseMoveEvent = self.MoveWindow
 
         self.btnSaveKey.clicked.connect(self.update_api_key)
+        self.btnSaveModel.clicked.connect(self.update_or_append_llm_model)
 
     def MoveWindow(self, event):
         if self.isMaximized() == False:
@@ -46,16 +47,21 @@ class APIKEY(QDialog):
 
     def update_api_key(self):
         key = self.apiKeyEdit.text()
-        self.append_or_update_api_key(self.apiKeyPath(), key)
+        self.append_or_update_api_key(self.get_json_path("apiKey.json"), key)
         self.keyStatus.setText(f"Key updated: {datetime.now()}")
+
+    def update_or_append_llm_model(self):
+        model_name = self.llmModelName.text()
+        self.append_or_update_llm_model(self.get_json_path("llmModels.json"), model_name)
+        self.keyStatus.setText(f"Model inserted or updated successfully.\n{datetime.now()}")
     
-    def apiKeyPath(self):
+    def get_json_path(self, file_name: str):
         # Determine root directory based on OS
         if os.name == "nt":  # For Windows
             root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
         else:  # For Unix-based systems (Linux/macOS)
             root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
-        json_path = Path(root_dir) / "apiKey.json"
+        json_path = Path(root_dir) / f"{file_name}"
         return json_path
 
     def append_or_update_api_key(self, file_path: str, api_key: str):
@@ -85,6 +91,28 @@ class APIKEY(QDialog):
         with open(file_path, "w") as file:
             json.dump(data, file, indent=4)
 
+    def append_or_update_llm_model(self, file_path: str, model_name: str):
+        # Check if the file exists and is not empty
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            # Load existing JSON data
+            with open(file_path, "r") as file:
+                try:
+                    data = json.load(file)
+                    # Ensure it's a dictionary, reset if not
+                    if not isinstance(data, dict):
+                        data = {}
+                except json.JSONDecodeError:
+                    data = {}  # Initialize as an empty dictionary if invalid JSON
+        else:
+            data = {}  # Initialize as an empty dictionary if file doesn't exist or is empty
+
+        # Update or add the 'apiKey'
+        data[f"{model_name}"] = model_name
+
+        # Write the updated data back to the file
+        with open(file_path, "w") as file:
+            json.dump(data, file, indent=4)
+
 
 class FileWalkerThread(QThread):
     # Define a signal to send file names to the main thread
@@ -108,6 +136,7 @@ class FileWalkerThread(QThread):
                     self.file_found.emit(
                         str(full_path)
                     )  # Emit the full file path as a string
+                    print(os.path.basename(full_path))
         self.finished.emit()
 
 
@@ -119,12 +148,12 @@ class MainWindow(QMainWindow):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.oldPosition = self.pos()
         self.create_program_directory()
-        self.populateProjectComboBox()
+        self.populateComboBoxes()
         self.qtRectangle = self.frameGeometry()
         self.centerPoint = QDesktopWidget().availableGeometry().center()
         self.qtRectangle.moveCenter(self.centerPoint)
         self.move(self.qtRectangle.topLeft())
-        self.dialog = APIKEY()
+        self.dialog = SettingsDialog()
 
         self.btnClose.clicked.connect(self.close_app)
         self.btnMinimize.clicked.connect(self.showMinimized)
@@ -139,7 +168,7 @@ class MainWindow(QMainWindow):
 
         self.btnBrowse.clicked.connect(self.browseProjectFolder)
 
-        self.btnRemoveProject.clicked.connect(self.on_remove_roject)
+        self.btnRemoveProject.clicked.connect(self.on_remove_project)
 
         self.btnResetTextEdit.clicked.connect(self.clearContent)
 
@@ -260,9 +289,9 @@ class MainWindow(QMainWindow):
         project_path = self.projectPath.text()
         file_extensions = self.fileExtentionsTextEdit.toPlainText().strip()
         self.append_to_json(
-            self.projectsJson(), project_name, project_path, file_extensions
+            self.get_json_path("projects.json"), project_name, project_path, file_extensions
         )
-        self.populateProjectComboBox()
+        self.populateComboBoxes()
 
     def get_path_basename(self, path: str) -> str:
         return os.path.basename(path)
@@ -280,14 +309,17 @@ class MainWindow(QMainWindow):
             json_api = Path(json_api)
             json_api.touch(exist_ok=True)
             json_path.touch(exist_ok=True)
+            json_models = os.path.join(root_dir, "llmModels.json")
+            json_models = Path(json_models)
+            json_models.touch(exist_ok=True)
 
-    def projectsJson(self):
+    def get_json_path(self, file_name: str):
         # Determine root directory based on OS
         if os.name == "nt":  # For Windows
             root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
         else:  # For Unix-based systems (Linux/macOS)
             root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
-        json_path = Path(root_dir) / "projects.json"
+        json_path = Path(root_dir) / f"{file_name}"
         return json_path
 
     def is_git_repository(self, folder_path):
@@ -354,17 +386,20 @@ class MainWindow(QMainWindow):
             except json.JSONDecodeError as e:
                 raise ValueError(f"Error decoding JSON: {e}")
 
-    def populateProjectComboBox(self):
+    def populateComboBoxes(self):
         self.projectsComboBox.clear()
-        path = self.get_json_keys(self.projectsJson())
+        path = self.get_json_keys(self.get_json_path("projects.json"))
         self.projectsComboBox.addItems(path)
+        self.llmModels.clear()
+        path = self.get_json_keys(self.get_json_path("llmModels.json"))
+        self.llmModels.addItems(path)
 
     def on_combo_box_changed(self):
         try:
             self.fileExtentionsTextEdit.clear()
             self.textEdit.clear()
             selected_item = self.projectsComboBox.currentText()
-            item = self.get_item_by_key(selected_item)
+            item = self.get_item_by_key(selected_item, "projects.json")
             self.projectPath.setText(item["path"])
             self.string_extensions = item["extensions"]
             self.start_walking(
@@ -375,12 +410,12 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"An exception occurred: {str(e)}")
 
-    def on_remove_roject(self):
+    def on_remove_project(self):
         selected_item = self.projectsComboBox.currentText()
-        self.remove_element_by_key(self.projectsJson(), selected_item)
+        self.remove_element_by_key(self.get_json_path("projects.json"), selected_item)
         self.projectPath.setText("Project path")
         self.fileExtentionsTextEdit.clear()
-        self.populateProjectComboBox()
+        self.populateComboBoxes()
 
     # Function to load the JSON file
     def load_json_file(self, file_path):
@@ -416,8 +451,8 @@ class MainWindow(QMainWindow):
         else:
             print("Failed to load the file.")
 
-    def get_item_by_key(self, key: str):
-        with open(self.projectsJson(), "r") as file:
+    def get_item_by_key(self, key: str, file_name: str):
+        with open(self.get_json_path(file_name), "r") as file:
             try:
                 # Load JSON data
                 json_data = json.load(file)

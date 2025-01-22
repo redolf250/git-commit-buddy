@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>622</width>
-    <height>243</height>
+    <height>362</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,16 +109,16 @@ QPushButton:hover{
       <widget class="QLabel" name="label">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>40</x>
          <y>0</y>
-         <width>141</width>
+         <width>111</width>
          <height>51</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Baskerville Old Face</family>
-         <pointsize>12</pointsize>
+         <pointsize>18</pointsize>
         </font>
        </property>
        <property name="styleSheet">
@@ -126,7 +126,33 @@ QPushButton:hover{
 padding-left:5px;</string>
        </property>
        <property name="text">
-        <string>APIKEY</string>
+        <string>Settings</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>0</y>
+         <width>41</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Baskerville Old Face</family>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+padding-left:5px;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>../resources/assert/settings.svg</pixmap>
        </property>
       </widget>
      </widget>
@@ -152,7 +178,7 @@ padding-left:5px;</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>20</y>
          <width>451</width>
          <height>51</height>
         </rect>
@@ -173,7 +199,7 @@ border: 2px solid rgb(255,255,255);
 </string>
        </property>
        <property name="placeholderText">
-        <string>Enter api key</string>
+        <string>Enter api key...</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>true</bool>
@@ -183,7 +209,7 @@ border: 2px solid rgb(255,255,255);
        <property name="geometry">
         <rect>
          <x>480</x>
-         <y>90</y>
+         <y>20</y>
          <width>111</width>
          <height>51</height>
         </rect>
@@ -221,40 +247,113 @@ QPushButton:pressed{
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLabel" name="keyStatus">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>581</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>40</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Baskerville Old Face</family>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color: rgb(255, 255, 255);
+     </widget>
+     <widget class="QLineEdit" name="llmModelName">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>180</y>
+        <width>451</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Baskerville Old Face</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit{
+color: rgb(255, 255, 255);
+padding-left: 5px;
+border-radius: 5px;
+border: 2px solid rgb(255,255,255);	
+}
+</string>
+      </property>
+      <property name="placeholderText">
+       <string>Enter model name....</string>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnSaveModel">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>180</y>
+        <width>111</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Baskerville Old Face</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../resources/assert/layers.svg</normaloff>../resources/assert/layers.svg</iconset>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="keyStatus">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>260</y>
+        <width>581</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>40</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Baskerville Old Face</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(255, 255, 255);
 background-color: rgb(66, 66, 66);
 padding-left: 2px;
 border-radius: 5px;</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
      </widget>
     </widget>
    </item>

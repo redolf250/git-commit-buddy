@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1468</width>
-    <height>830</height>
+    <height>872</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
   <widget class="QWidget" name="centralwidget">
    <property name="minimumSize">
     <size>
-     <width>1343</width>
-     <height>0</height>
+     <width>1468</width>
+     <height>872</height>
     </size>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -338,7 +338,7 @@ QPushButton:hover{
              <property name="geometry">
               <rect>
                <x>0</x>
-               <y>710</y>
+               <y>760</y>
                <width>55</width>
                <height>60</height>
               </rect>
@@ -563,13 +563,13 @@ QPushButton:hover{
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>742</height>
+                 <height>800</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>742</height>
+                 <height>800</height>
                 </size>
                </property>
                <property name="currentIndex">
@@ -616,7 +616,7 @@ QPushButton:hover{
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>80</y>
+                      <y>150</y>
                       <width>171</width>
                       <height>51</height>
                      </rect>
@@ -647,7 +647,7 @@ border: 2px solid rgb(255,255,255);
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>10</y>
+                      <y>80</y>
                       <width>301</width>
                       <height>51</height>
                      </rect>
@@ -682,7 +682,7 @@ border: 2px solid rgb(255,255,255);
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>150</y>
+                      <y>220</y>
                       <width>171</width>
                       <height>51</height>
                      </rect>
@@ -719,7 +719,7 @@ border: 2px solid rgb(255,255,255);
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>390</y>
+                      <y>450</y>
                       <width>181</width>
                       <height>51</height>
                      </rect>
@@ -761,9 +761,9 @@ QPushButton:pressed{
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>460</y>
+                      <y>520</y>
                       <width>301</width>
-                      <height>281</height>
+                      <height>261</height>
                      </rect>
                     </property>
                     <property name="font">
@@ -798,7 +798,7 @@ p, li { white-space: pre-wrap; }
                     <property name="geometry">
                      <rect>
                       <x>200</x>
-                      <y>390</y>
+                      <y>450</y>
                       <width>111</width>
                       <height>51</height>
                      </rect>
@@ -846,7 +846,7 @@ QPushButton:pressed{
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>320</y>
+                      <y>380</y>
                       <width>301</width>
                       <height>51</height>
                      </rect>
@@ -883,7 +883,7 @@ border: 2px solid rgb(255,255,255);
                     <property name="geometry">
                      <rect>
                       <x>190</x>
-                      <y>150</y>
+                      <y>220</y>
                       <width>121</width>
                       <height>51</height>
                      </rect>
@@ -925,7 +925,7 @@ QPushButton:pressed{
                     <property name="geometry">
                      <rect>
                       <x>190</x>
-                      <y>80</y>
+                      <y>150</y>
                       <width>121</width>
                       <height>51</height>
                      </rect>
@@ -967,7 +967,7 @@ QPushButton:pressed{
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>220</y>
+                      <y>290</y>
                       <width>171</width>
                       <height>51</height>
                      </rect>
@@ -1009,7 +1009,7 @@ QPushButton:pressed{
                     <property name="geometry">
                      <rect>
                       <x>190</x>
-                      <y>220</y>
+                      <y>290</y>
                       <width>121</width>
                       <height>51</height>
                      </rect>
@@ -1047,6 +1047,41 @@ QPushButton:pressed{
                      <bool>true</bool>
                     </property>
                    </widget>
+                   <widget class="QComboBox" name="llmModels">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>10</y>
+                      <width>301</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>14</pointsize>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QComboBox{
+color: rgb(255, 255, 255);
+padding-left: 5px;
+border-radius: 5px;
+border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="editable">
+                     <bool>false</bool>
+                    </property>
+                    <property name="placeholderText">
+                     <string notr="true">Select Project</string>
+                    </property>
+                    <property name="frame">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </widget>
                  </item>
                  <item>
@@ -1063,7 +1098,7 @@ QPushButton:pressed{
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>40</height>
+                        <height>50</height>
                        </size>
                       </property>
                       <property name="font">
