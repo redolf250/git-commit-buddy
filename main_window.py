@@ -2,9 +2,19 @@ import os
 import json
 from PyQt5 import uic
 from pathlib import Path
+from datetime import datetime
 from PyQt5.QtGui import QFont, QColor
-from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QFileDialog, QDialog, QGraphicsDropShadowEffect
+from PyQt5.QtCore import QPoint, Qt, QThread, pyqtSignal
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QDesktopWidget,
+    QFileDialog,
+    QDialog,
+    QGraphicsDropShadowEffect,
+)
+
+
+extensions = [".cs", ".cshtml"]
 
 
 class APIKEY(QDialog):
@@ -13,6 +23,7 @@ class APIKEY(QDialog):
         uic.loadUi("./views/api_key_dialog.ui", self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowModality(Qt.ApplicationModal)
         self.btnClose.clicked.connect(self.close)
         self.shadow = QGraphicsDropShadowEffect(self)
         self.shadow.setBlurRadius(20)
@@ -20,6 +31,87 @@ class APIKEY(QDialog):
         self.shadow.setYOffset(0)
         self.shadow.setColor(QColor(230, 230, 230, 50))
         self.setGraphicsEffect(self.shadow)
+        self.mouseMoveEvent = self.MoveWindow
+
+        self.btnSaveKey.clicked.connect(self.update_api_key)
+
+    def MoveWindow(self, event):
+        if self.isMaximized() == False:
+            self.move(self.pos() + event.globalPos() - self.clickPosition)
+            self.clickPosition = event.globalPos()
+            event.accept()
+
+    def mousePressEvent(self, event):
+        self.clickPosition = event.globalPos()
+
+    def set_api_key(self, text):
+        self.apiKeyEdit.setText(text)
+
+    def update_api_key(self):
+        key = self.apiKeyEdit.text()
+        self.append_or_update_api_key(self.apiKeyPath(), key)
+        self.keyStatus.setText(f"Key updated: {datetime.now()}")
+    
+    def apiKeyPath(self):
+        # Determine root directory based on OS
+        if os.name == "nt":  # For Windows
+            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
+        else:  # For Unix-based systems (Linux/macOS)
+            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
+        json_path = Path(root_dir) / "apiKey.json"
+        return json_path
+
+    def append_or_update_api_key(self, file_path: str, api_key: str):
+        """
+        Append or update the 'apiKey' entry in a JSON file.
+        If the file doesn't exist or is empty, create it with the 'apiKey'.
+        If the 'apiKey' already exists, update its value.
+        """
+        # Check if the file exists and is not empty
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            # Load existing JSON data
+            with open(file_path, "r") as file:
+                try:
+                    data = json.load(file)
+                    # Ensure it's a dictionary, reset if not
+                    if not isinstance(data, dict):
+                        data = {}
+                except json.JSONDecodeError:
+                    data = {}  # Initialize as an empty dictionary if invalid JSON
+        else:
+            data = {}  # Initialize as an empty dictionary if file doesn't exist or is empty
+
+        # Update or add the 'apiKey'
+        data["apiKey"] = api_key
+
+        # Write the updated data back to the file
+        with open(file_path, "w") as file:
+            json.dump(data, file, indent=4)
+
+
+class FileWalkerThread(QThread):
+    # Define a signal to send file names to the main thread
+    file_found = pyqtSignal(str)
+    finished = pyqtSignal()
+
+    def __init__(self, directory, extensions):
+        super().__init__()
+        self.directory = Path(
+            directory
+        )  # Convert the directory to a pathlib.Path object
+        self.extensions = extensions  # List or tuple of valid file extensions
+
+    def run(self):
+        # Walk through the directory and find files with the specified extensions
+        for root, _, files in os.walk(self.directory):
+            root_path = Path(root)  # Convert the root to a pathlib.Path object
+            for file in files:
+                if file.endswith(tuple(self.extensions)):  # Check file extensions
+                    full_path = root_path / file  # Construct the full file path
+                    self.file_found.emit(
+                        str(full_path)
+                    )  # Emit the full file path as a string
+        self.finished.emit()
 
 
 class MainWindow(QMainWindow):
@@ -35,8 +127,9 @@ class MainWindow(QMainWindow):
         self.centerPoint = QDesktopWidget().availableGeometry().center()
         self.qtRectangle.moveCenter(self.centerPoint)
         self.move(self.qtRectangle.topLeft())
+        self.dialog = APIKEY()
 
-        self.btnClose.clicked.connect(self.close)
+        self.btnClose.clicked.connect(self.close_app)
         self.btnMinimize.clicked.connect(self.showMinimized)
 
         self.btnCommit.clicked.connect(
@@ -51,14 +144,88 @@ class MainWindow(QMainWindow):
 
         self.btnRemoveProject.clicked.connect(self.on_remove_roject)
 
+        self.btnResetTextEdit.clicked.connect(self.clearContent)
+
         self.btnSaveProjectConfiguration.clicked.connect(self.saveProjectConfiguration)
         self.setExtentionsFont()
 
         self.projectsComboBox.currentIndexChanged.connect(self.on_combo_box_changed)
 
+    def close_app(self):
+        try:
+            self.close()
+            self.dialog.close()
+        except Exception as e:
+            print(f"{str(e)}")
+    
+    def apiKeyPath(self):
+        # Determine root directory based on OS
+        if os.name == "nt":  # For Windows
+            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
+        else:  # For Unix-based systems (Linux/macOS)
+            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
+        json_path = Path(root_dir) / "apiKey.json"
+        return json_path
+
+    def clearContent(self):
+        self.textEdit.clear()
+        self.issueKeyLineEdit.clear()
+        self.projectKey.clear()
+        self.projectPath.setText('Project Path')
+        self.fileExtentionsTextEdit.clear()
+        self.commitMessageLenghtEdit.clear()
+
+    def start_walking(self, directory, extensions):
+        try:
+            if directory:
+                self.textEdit.append(f"Scanning directory: {directory}\n")
+                # Initialize and start the file walker thread
+                self.thread = FileWalkerThread(directory, extensions)
+                self.thread.file_found.connect(self.append_file)
+                self.thread.finished.connect(self.scan_finished)
+                self.thread.start()
+        except Exception as e:
+            print(f"An error occured: {str(e)}")
+
+    def append_file(self, file_path):
+        # Append the file path to the text area
+        self.textEdit.append(file_path)
+
+    def scan_finished(self):
+        # Notify when the scan is complete
+        self.textEdit.append("\nScan Complete!")
+
+    def closeEvent(self, event):
+        try:
+            # Ensure the thread is stopped properly when closing the window
+            if hasattr(self, "thread") and self.thread.isRunning():
+                self.thread.quit()
+                self.thread.wait()
+            event.accept()
+        except Exception as e:
+            print(f"An error occured: {str(e)}")
+
     def open_dialog(self):
-        self.dialog = APIKEY()
+        self.dialog.set_api_key(self.get_api_key(self.apiKeyPath()))
         self.dialog.show()
+
+    def get_api_key(self, file_path: str):
+        """
+        Read the JSON file and return the value of the 'apiKey' entry.
+        If the key does not exist, return None or a custom message.
+        """
+        # Check if the file exists and is not empty
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            # Load existing JSON data
+            with open(file_path, "r") as file:
+                try:
+                    data = json.load(file)
+                    # Return the value of 'apiKey' if it exists, else return None
+                    return data.get("apiKey", None)  # Or provide a default value/message
+                except json.JSONDecodeError:
+                    return None  # If the file contains invalid JSON
+        else:
+            return None  # If the file doesn't exist or is empty
 
     def setExtentionsFont(self):
         font = QFont()
@@ -66,6 +233,11 @@ class MainWindow(QMainWindow):
         font.setPointSize(15)  # Set font size to 14
         self.fileExtentionsTextEdit.setFont(font)
         self.fileExtentionsTextEdit.clear()
+        font1 = QFont()
+        # font1.setFamily('Baskerville Old Face')
+        font1.setPointSize(11)
+        self.textEdit.setFont(font1)
+        self.textEdit.clear()
 
     def mousePressEvent(self, event):
         self.oldPosition = event.globalPos()
@@ -111,15 +283,6 @@ class MainWindow(QMainWindow):
             json_api = Path(json_api)
             json_api.touch(exist_ok=True)
             json_path.touch(exist_ok=True)
-
-    def apiKeyPath(self):
-        # Determine root directory based on OS
-        if os.name == "nt":  # For Windows
-            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
-        else:  # For Unix-based systems (Linux/macOS)
-            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
-        json_path = Path(root_dir) / "apiKey.json"
-        return json_path
 
     def projectsJson(self):
         # Determine root directory based on OS
@@ -202,25 +365,30 @@ class MainWindow(QMainWindow):
     def on_combo_box_changed(self):
         try:
             self.fileExtentionsTextEdit.clear()
+            self.textEdit.clear()
             selected_item = self.projectsComboBox.currentText()
             item = self.get_item_by_key(selected_item)
-            self.projectPath.setText(item['path'])
+            self.projectPath.setText(item["path"])
+            self.string_extensions = item["extensions"]
+            self.start_walking(
+                item["path"], [ext.strip() for ext in self.string_extensions.split(",")]
+            )
             self.projectKey.setText(selected_item)
-            self.fileExtentionsTextEdit.append(item['extensions'])
+            self.fileExtentionsTextEdit.append(self.string_extensions)
         except Exception as e:
-            print(f'An exception occurred: {str(e)}')
-    
+            print(f"An exception occurred: {str(e)}")
+
     def on_remove_roject(self):
         selected_item = self.projectsComboBox.currentText()
         self.remove_element_by_key(self.projectsJson(), selected_item)
-        self.projectPath.setText('Project path')
+        self.projectPath.setText("Project path")
         self.fileExtentionsTextEdit.clear()
         self.populateProjectComboBox()
 
     # Function to load the JSON file
     def load_json_file(self, file_path):
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, "r") as file:
                 return json.load(file)
         except FileNotFoundError:
             print("The file was not found.")
@@ -231,14 +399,14 @@ class MainWindow(QMainWindow):
 
     # Function to save the modified JSON back to the file
     def save_json_file(self, file_path, data):
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             json.dump(data, file, indent=4)
 
     # Function to remove an element by key
     def remove_element_by_key(self, file_path, key_to_remove):
         # Load the existing data from the file
         data = self.load_json_file(file_path)
-        
+
         if data is not None:
             # Check if the key exists in the data
             if key_to_remove in data:
@@ -262,4 +430,3 @@ class MainWindow(QMainWindow):
                     return None
             except json.JSONDecodeError as e:
                 raise ValueError(f"Error decoding JSON: {e}")
-        

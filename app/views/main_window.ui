@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1001</width>
-    <height>823</height>
+    <width>1468</width>
+    <height>830</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,12 @@
    <string notr="true">background-color: rgb(40, 44, 52);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="minimumSize">
+    <size>
+     <width>1343</width>
+     <height>0</height>
+    </size>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>0</number>
@@ -138,7 +144,7 @@
         <widget class="QFrame" name="rightTopBar">
          <property name="minimumSize">
           <size>
-           <width>110</width>
+           <width>120</width>
            <height>0</height>
           </size>
          </property>
@@ -156,7 +162,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
-           <number>0</number>
+           <number>5</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -185,6 +191,10 @@
              <string notr="true">QPushButton{
 	color: rgb(255, 255, 255);
 	border:none;
+}
+
+QPushButton:hover{
+	background-color: rgb(66, 66, 66);
 }
 </string>
             </property>
@@ -221,6 +231,11 @@
              <string notr="true">QPushButton{
 	color: rgb(255, 255, 255);
 	border:none;
+}
+
+QPushButton:hover{
+	
+	background-color: rgb(255, 0, 0);
 }
 </string>
             </property>
@@ -339,16 +354,7 @@
 	color: rgb(255, 255, 255);
 	border:none;
 }
-
-QPushButton:hover{
-	border-left: 3px solid rgb(255,255,255);
-}
-
-
- QPushButton:focus{
-    color: rgb(255, 255, 255);
-    border-left: 2px solid rgb(255,255,255);	
-  }</string>
+</string>
              </property>
              <property name="text">
               <string/>
@@ -590,13 +596,13 @@ QPushButton:hover{
                   <widget class="QFrame" name="frame_3">
                    <property name="minimumSize">
                     <size>
-                     <width>300</width>
+                     <width>320</width>
                      <height>0</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>250</width>
+                     <width>260</width>
                      <height>16777215</height>
                     </size>
                    </property>
@@ -642,14 +648,14 @@ border: 2px solid rgb(255,255,255);
                      <rect>
                       <x>10</x>
                       <y>10</y>
-                      <width>281</width>
+                      <width>301</width>
                       <height>51</height>
                      </rect>
                     </property>
                     <property name="font">
                      <font>
                       <family>Baskerville Old Face</family>
-                      <pointsize>15</pointsize>
+                      <pointsize>14</pointsize>
                       <weight>50</weight>
                       <bold>false</bold>
                      </font>
@@ -677,7 +683,7 @@ border: 2px solid rgb(255,255,255);
                      <rect>
                       <x>10</x>
                       <y>150</y>
-                      <width>141</width>
+                      <width>171</width>
                       <height>51</height>
                      </rect>
                     </property>
@@ -713,8 +719,8 @@ border: 2px solid rgb(255,255,255);
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>240</y>
-                      <width>281</width>
+                      <y>390</y>
+                      <width>181</width>
                       <height>51</height>
                      </rect>
                     </property>
@@ -741,7 +747,7 @@ QPushButton:pressed{
 }</string>
                     </property>
                     <property name="text">
-                     <string>New Project Repository</string>
+                     <string>New Repository</string>
                     </property>
                     <property name="icon">
                      <iconset>
@@ -755,8 +761,8 @@ QPushButton:pressed{
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>450</y>
-                      <width>281</width>
+                      <y>460</y>
+                      <width>301</width>
                       <height>281</height>
                      </rect>
                     </property>
@@ -791,9 +797,9 @@ p, li { white-space: pre-wrap; }
                    <widget class="QPushButton" name="btnSaveProjectConfiguration">
                     <property name="geometry">
                      <rect>
-                      <x>10</x>
-                      <y>380</y>
-                      <width>281</width>
+                      <x>200</x>
+                      <y>390</y>
+                      <width>111</width>
                       <height>51</height>
                      </rect>
                     </property>
@@ -820,7 +826,7 @@ QPushButton:pressed{
 }</string>
                     </property>
                     <property name="text">
-                     <string>Save Project</string>
+                     <string>Save</string>
                     </property>
                     <property name="icon">
                      <iconset>
@@ -840,8 +846,8 @@ QPushButton:pressed{
                     <property name="geometry">
                      <rect>
                       <x>10</x>
-                      <y>310</y>
-                      <width>281</width>
+                      <y>320</y>
+                      <width>301</width>
                       <height>51</height>
                      </rect>
                     </property>
@@ -876,9 +882,9 @@ border: 2px solid rgb(255,255,255);
                    <widget class="QPushButton" name="btnGenerateCommit">
                     <property name="geometry">
                      <rect>
-                      <x>160</x>
+                      <x>190</x>
                       <y>150</y>
-                      <width>131</width>
+                      <width>121</width>
                       <height>51</height>
                      </rect>
                     </property>
@@ -920,7 +926,7 @@ QPushButton:pressed{
                      <rect>
                       <x>190</x>
                       <y>80</y>
-                      <width>101</width>
+                      <width>121</width>
                       <height>51</height>
                      </rect>
                     </property>
@@ -952,6 +958,90 @@ QPushButton:pressed{
                     <property name="icon">
                      <iconset>
                       <normaloff>../resources/assert/minus.svg</normaloff>../resources/assert/minus.svg</iconset>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnClearMemory">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>220</y>
+                      <width>171</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Memory</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/refresh-ccw.svg</normaloff>../resources/assert/refresh-ccw.svg</iconset>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnResetTextEdit">
+                    <property name="geometry">
+                     <rect>
+                      <x>190</x>
+                      <y>220</y>
+                      <width>121</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Reset</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/trash.svg</normaloff>../resources/assert/trash.svg</iconset>
                     </property>
                     <property name="flat">
                      <bool>true</bool>
@@ -998,6 +1088,12 @@ border-radius: 5px;</string>
                     </item>
                     <item>
                      <widget class="QTextEdit" name="textEdit">
+                      <property name="font">
+                       <font>
+                        <family>Baskerville Old Face</family>
+                        <pointsize>11</pointsize>
+                       </font>
+                      </property>
                       <property name="styleSheet">
                        <string notr="true">color: rgb(255, 255, 255);</string>
                       </property>
@@ -1007,12 +1103,15 @@ border-radius: 5px;</string>
                       <property name="frameShadow">
                        <enum>QFrame::Plain</enum>
                       </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
                       <property name="html">
                        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Hello World&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Baskerville Old Face'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                       </property>
                      </widget>
                     </item>

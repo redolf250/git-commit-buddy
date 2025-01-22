@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
-    <height>235</height>
+    <width>622</width>
+    <height>243</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,6 +81,11 @@ border-radius: 5px;</string>
         <string notr="true">QPushButton{
 	color: rgb(255, 255, 255);
 	border:none;
+	border-radius: 0px;
+}
+
+QPushButton:hover{
+	background-color: rgb(255, 0, 0);
 }
 </string>
        </property>
@@ -143,11 +148,11 @@ padding-left:5px;</string>
       <property name="frameShadow">
        <enum>QFrame::Plain</enum>
       </property>
-      <widget class="QLineEdit" name="apiKeyEdit_2">
+      <widget class="QLineEdit" name="apiKeyEdit">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
+         <y>90</y>
          <width>451</width>
          <height>51</height>
         </rect>
@@ -174,11 +179,11 @@ border: 2px solid rgb(255,255,255);
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="btnSaveKey_2">
+      <widget class="QPushButton" name="btnSaveKey">
        <property name="geometry">
         <rect>
          <x>480</x>
-         <y>60</y>
+         <y>90</y>
          <width>111</width>
          <height>51</height>
         </rect>
@@ -214,6 +219,40 @@ QPushButton:pressed{
        </property>
        <property name="flat">
         <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="keyStatus">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>581</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Baskerville Old Face</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(66, 66, 66);
+padding-left: 2px;
+border-radius: 5px;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </widget>
