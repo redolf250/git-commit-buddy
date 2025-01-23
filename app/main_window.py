@@ -1,5 +1,6 @@
 import os
 import json
+import subprocess
 from PyQt5 import uic
 from pathlib import Path
 from datetime import datetime
@@ -12,6 +13,8 @@ from PyQt5.QtWidgets import (
     QDialog,
     QGraphicsDropShadowEffect,
 )
+
+datastore = {}
 
 
 class SettingsDialog(QDialog):
@@ -52,9 +55,13 @@ class SettingsDialog(QDialog):
 
     def update_or_append_llm_model(self):
         model_name = self.llmModelName.text()
-        self.append_or_update_llm_model(self.get_json_path("llmModels.json"), model_name)
-        self.keyStatus.setText(f"Model inserted or updated successfully.\n{datetime.now()}")
-    
+        self.append_or_update_llm_model(
+            self.get_json_path("llmModels.json"), model_name
+        )
+        self.keyStatus.setText(
+            f"Model inserted or updated successfully.\n{datetime.now()}"
+        )
+
     def get_json_path(self, file_name: str):
         # Determine root directory based on OS
         if os.name == "nt":  # For Windows
@@ -82,7 +89,9 @@ class SettingsDialog(QDialog):
                 except json.JSONDecodeError:
                     data = {}  # Initialize as an empty dictionary if invalid JSON
         else:
-            data = {}  # Initialize as an empty dictionary if file doesn't exist or is empty
+            data = (
+                {}
+            )  # Initialize as an empty dictionary if file doesn't exist or is empty
 
         # Update or add the 'apiKey'
         data["apiKey"] = api_key
@@ -104,7 +113,9 @@ class SettingsDialog(QDialog):
                 except json.JSONDecodeError:
                     data = {}  # Initialize as an empty dictionary if invalid JSON
         else:
-            data = {}  # Initialize as an empty dictionary if file doesn't exist or is empty
+            data = (
+                {}
+            )  # Initialize as an empty dictionary if file doesn't exist or is empty
 
         # Update or add the 'apiKey'
         data[f"{model_name}"] = model_name
@@ -136,8 +147,72 @@ class FileWalkerThread(QThread):
                     self.file_found.emit(
                         str(full_path)
                     )  # Emit the full file path as a string
-                    print(os.path.basename(full_path))
         self.finished.emit()
+
+
+class ProcessDirectoryContent(QThread):
+    # Signals to communicate with the main thread
+    process_file_found = pyqtSignal(str)
+    process_finished = pyqtSignal()
+    process_error = pyqtSignal(str)
+    git_installation = pyqtSignal(str)
+
+    def __init__(self, directory, extensions):
+        super().__init__()
+        self.directory = Path(directory)  # Convert to pathlib.Path
+        self.extensions = [ext.lower() for ext in extensions]  # Normalize extensions
+
+    def run(self):
+
+        # Verify the directory is a Git repository
+        try:
+            subprocess.run(
+                ["git", "rev-parse", "--is-inside-work-tree"],
+                cwd=self.directory,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except subprocess.CalledProcessError:
+            self.process_error.emit(f"{self.directory} is not a Git repository.")
+            return
+
+        # Process files
+        for root, _, files in os.walk(self.directory):
+            root_path = Path(root)
+            for file in files:
+                if file.lower().endswith(tuple(self.extensions)):
+                    full_path = root_path / file
+                    try:
+                        # Emit signal for found file
+                        self.process_file_found.emit(
+                            f"[{datetime.now()}] Processed file: {os.path.basename(full_path)}"
+                        )
+    
+                        # Run git diff
+                        result = subprocess.run(
+                            ["git", "diff", str(full_path)],
+                            cwd=self.directory,
+                            capture_output=True,
+                            text=True,
+                        )
+                    
+                        if result.returncode == 0 and result.stdout.strip() !='':
+                            print(f"Changes in {Path(full_path)}:\n{result.stdout.strip()}")
+                            self.data_store(str(full_path), result.stdout.strip())
+                        elif result.returncode != 0:
+                            self.process_error.emit(
+                                f"Error running git diff: {result.stderr}"
+                            )
+                    except Exception as e:
+                        self.process_error.emit(f"An error occurred: {str(e)}")
+        print(datastore)
+        self.process_finished.emit()
+
+
+    def data_store(self, file_path: str, changes: str):
+        datastore[file_path] = changes
+        return datastore
 
 
 class MainWindow(QMainWindow):
@@ -149,6 +224,7 @@ class MainWindow(QMainWindow):
         self.oldPosition = self.pos()
         self.create_program_directory()
         self.populateComboBoxes()
+        self.gitVersion.setText(self.check_git_installation())
         self.qtRectangle = self.frameGeometry()
         self.centerPoint = QDesktopWidget().availableGeometry().center()
         self.qtRectangle.moveCenter(self.centerPoint)
@@ -171,6 +247,7 @@ class MainWindow(QMainWindow):
         self.btnRemoveProject.clicked.connect(self.on_remove_project)
 
         self.btnResetTextEdit.clicked.connect(self.clearContent)
+        self.btnGenerateCommit.clicked.connect(self.process_directory_content)
 
         self.btnSaveProjectConfiguration.clicked.connect(self.saveProjectConfiguration)
         self.setExtentionsFont()
@@ -183,7 +260,72 @@ class MainWindow(QMainWindow):
             self.dialog.close()
         except Exception as e:
             print(f"{str(e)}")
-    
+
+    def check_git_installation(self):
+        try:
+            result = subprocess.run(
+                ["git", "--version"], capture_output=True, text=True
+            )
+            return result.stdout
+        except subprocess.CalledProcessError:
+            return "Path to git exe not found"
+
+    def process_directory_content(self):
+        try:
+            selected_item = self.projectsComboBox.currentText()
+            self.fileExtentionsTextEdit.clear()
+            self.textEdit.clear()
+            if selected_item:  # If the text is not empty
+                item = self.get_item_by_key(selected_item, "projects.json")
+                self.projectPath.setText(item["path"])
+                self.string_extensions = item["extensions"]
+                self.directory_content_processor(
+                    item["path"],
+                    [ext.strip() for ext in self.string_extensions.split(",")],
+                )
+                self.projectKey.setText(selected_item)
+                self.fileExtentionsTextEdit.append(self.string_extensions)
+                self.process_thread.quit()
+            else:
+                self.textEdit.setText("No project selected!")
+
+        except Exception as e:
+            print(f"An exception occurred: {str(e)}")
+
+    def directory_content_processor(self, directory, extensions):
+        try:
+            if directory:
+                self.textEdit.append(f"Processing directory content: {directory}\n")
+                # Initialize and start the file walker thread
+                self.process_thread = ProcessDirectoryContent(directory, extensions)
+                self.process_thread.process_file_found.connect(
+                    self.append_processed_file
+                )
+                self.process_thread.process_finished.connect(self.processing_finished)
+                self.process_thread.process_error.connect(self.append_processed_file)
+                self.process_thread.git_installation.connect(self.append_processed_file)
+                self.process_thread.start()
+        except Exception as e:
+            print(f"An error occured: {str(e)}")
+
+    def append_processed_file(self, file_path):
+        # Append the file path to the text area
+        self.textEdit.append(file_path)
+
+    def processing_finished(self):
+        # Notify when the scan is complete
+        self.textEdit.append("\nProcessing Completed!")
+
+    def close_event(self, event):
+        try:
+            # Ensure the thread is stopped properly when closing the window
+            if hasattr(self, "process_thread") and self.process_thread.isRunning():
+                self.process_thread.quit()
+                self.process_thread.wait()
+            event.accept()
+        except Exception as e:
+            print(f"An error occured: {str(e)}")
+
     def apiKeyPath(self):
         # Determine root directory based on OS
         if os.name == "nt":  # For Windows
@@ -197,7 +339,7 @@ class MainWindow(QMainWindow):
         self.textEdit.clear()
         self.issueKeyLineEdit.clear()
         self.projectKey.clear()
-        self.projectPath.setText('Project Path')
+        self.projectPath.setText("Project Path")
         self.fileExtentionsTextEdit.clear()
         self.commitMessageLenghtEdit.clear()
 
@@ -247,7 +389,9 @@ class MainWindow(QMainWindow):
                 try:
                     data = json.load(file)
                     # Return the value of 'apiKey' if it exists, else return None
-                    return data.get("apiKey", None)  # Or provide a default value/message
+                    return data.get(
+                        "apiKey", None
+                    )  # Or provide a default value/message
                 except json.JSONDecodeError:
                     return None  # If the file contains invalid JSON
         else:
@@ -286,12 +430,22 @@ class MainWindow(QMainWindow):
 
     def saveProjectConfiguration(self):
         project_name = self.projectKey.text()
-        project_path = self.projectPath.text()
-        file_extensions = self.fileExtentionsTextEdit.toPlainText().strip()
-        self.append_to_json(
-            self.get_json_path("projects.json"), project_name, project_path, file_extensions
-        )
-        self.populateComboBoxes()
+        if project_name is not None and project_name != "":
+            project_path = self.projectPath.text()
+            file_extensions = self.fileExtentionsTextEdit.toPlainText().strip()
+            self.append_to_json(
+                self.get_json_path("projects.json"),
+                project_name,
+                project_path,
+                file_extensions,
+            )
+            self.textEdit.append(
+                f"[{datetime.now()} ] Project repository saved successfully..."
+            )
+            self.populateComboBoxes()
+        else:
+            self.textEdit.clear()
+            self.textEdit.append(f"[{datetime.now()} ] Project key is required")
 
     def get_path_basename(self, path: str) -> str:
         return os.path.basename(path)
@@ -312,6 +466,9 @@ class MainWindow(QMainWindow):
             json_models = os.path.join(root_dir, "llmModels.json")
             json_models = Path(json_models)
             json_models.touch(exist_ok=True)
+            data_store = os.path.join(root_dir, "dataStore.json")
+            data_store = Path(data_store)
+            data_store.touch(exist_ok=True)
 
     def get_json_path(self, file_name: str):
         # Determine root directory based on OS
