@@ -489,6 +489,8 @@ class PullRequestProcessor(QThread):
                     - Group related changes or updates for improved clarity.
                     - Highlight the key contributions made in the commits.
                     - Consider context from `chat_history` to ensure accuracy and relevance.
+                    - You can add titles or headers where neccessary for more structure output or add sub-sections
+                    if the changes is huge.
 
                     **Input**:
                     - `chat_history`: {{chat_history}}
@@ -583,6 +585,10 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("GitCommitBuddy")
         self.oldPosition = self.pos()
         self.create_program_directory()
+        self.copy_if_empty(
+            self.resource_path("foldersToSkip.txt"),
+            self.get_json_path("foldersToSkip.txt"),
+        )
         self.populateComboBoxes()
         self.gitVersion.setText(self.check_git_installation())
         self.qtRectangle = self.frameGeometry()
@@ -1071,3 +1077,20 @@ class MainWindow(QMainWindow):
                     return None
             except json.JSONDecodeError as e:
                 raise ValueError(f"Error decoding JSON: {e}")
+
+    def copy_if_empty(self, source_file, destination_file):
+        try:
+            # Check if the destination file exists and its size
+            if (
+                os.path.exists(destination_file)
+                and os.path.getsize(destination_file) > 0
+            ):
+                return  # Do nothing if the destination file is not empty
+
+            # Copy content from source file to destination file
+            with open(source_file, "r") as src, open(destination_file, "w") as dest:
+                dest.write(src.read())
+        except FileNotFoundError:
+            print(f"Error: {source_file} not found!")
+        except Exception as e:
+            print(f"An error occurred: {e}")
