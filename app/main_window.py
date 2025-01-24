@@ -1,10 +1,13 @@
 import os
 import json
+import socket
+import time
+import warnings
 import subprocess
 from PyQt5 import uic
 from pathlib import Path
 from datetime import datetime
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QFont, QColor, QIntValidator, QIcon
 from PyQt5.QtCore import QPoint, Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import (
     QMainWindow,
@@ -13,8 +16,10 @@ from PyQt5.QtWidgets import (
     QDialog,
     QGraphicsDropShadowEffect,
 )
-
-datastore = {}
+from langchain.chains import LLMChain
+from langchain.memory import ConversationBufferMemory
+from langchain_core.prompts import PromptTemplate
+from langchain_google_genai import GoogleGenerativeAI
 
 
 class SettingsDialog(QDialog):
@@ -136,18 +141,26 @@ class FileWalkerThread(QThread):
             directory
         )  # Convert the directory to a pathlib.Path object
         self.extensions = extensions  # List or tuple of valid file extensions
+        self.file_reader = FileReader()
+        self.content = self.file_reader.get_file_content("foldersToSkip.txt")
 
     def run(self):
-        # Walk through the directory and find files with the specified extensions
-        for root, _, files in os.walk(self.directory):
-            root_path = Path(root)  # Convert the root to a pathlib.Path object
-            for file in files:
-                if file.endswith(tuple(self.extensions)):  # Check file extensions
-                    full_path = root_path / file  # Construct the full file path
-                    self.file_found.emit(
-                        str(full_path)
-                    )  # Emit the full file path as a string
-        self.finished.emit()
+        try:
+            # Walk through the directory and find files with the specified extensions
+            for root, dirs, files in os.walk(self.directory):
+                root_path = Path(root)
+                dirs[:] = [d for d in dirs if d not in self.content]
+                for file in files:
+                    if file.endswith(tuple(self.extensions)):  # Check file extensions
+                        full_path = root_path / file  # Construct the full file path
+                        relative_path = os.path.relpath(full_path, self.directory)
+                        self.file_found.emit(
+                            relative_path
+                        )  # Emit the full file path as a string
+            self.finished.emit()
+        except Exception as e:
+            print(f"An error occured: {str(e)}")
+            raise e
 
 
 class ProcessDirectoryContent(QThread):
@@ -156,19 +169,32 @@ class ProcessDirectoryContent(QThread):
     process_finished = pyqtSignal()
     process_error = pyqtSignal(str)
     git_installation = pyqtSignal(str)
+    llm_message = pyqtSignal(str)
+    processing_time = pyqtSignal(str)
+    commited = pyqtSignal(str)
 
-    def __init__(self, directory, extensions):
+    def __init__(
+        self, directory, extensions, api_key, llm_model, message_length, issue_key
+    ):
         super().__init__()
+        self.api_key = api_key
+        self.llm_model = llm_model
+        self.message_length = message_length
+        self.issue_key = issue_key
         self.directory = Path(directory)  # Convert to pathlib.Path
         self.extensions = [ext.lower() for ext in extensions]  # Normalize extensions
+        self.messages: list = []
+        self.file_reader = FileReader()
+        self.content = self.file_reader.get_file_content("foldersToSkip.txt")
+        self.chain = self.prepare_llm_chain()
 
     def run(self):
+        self.start_time = time.time()
 
         # Verify the directory is a Git repository
         try:
             subprocess.run(
-                ["git", "rev-parse", "--is-inside-work-tree"],
-                cwd=self.directory,
+                ["git", "-C", self.directory, "rev-parse", "--is-inside-work-tree"],
                 check=True,
                 capture_output=True,
                 text=True,
@@ -178,41 +204,297 @@ class ProcessDirectoryContent(QThread):
             return
 
         # Process files
-        for root, _, files in os.walk(self.directory):
+        for root, dirs, files in os.walk(self.directory):
             root_path = Path(root)
+            dirs[:] = [d for d in dirs if d not in self.content]
             for file in files:
                 if file.lower().endswith(tuple(self.extensions)):
                     full_path = root_path / file
+                    relative_path = os.path.relpath(
+                        full_path, self.directory
+                    )  # Relative path
+
                     try:
                         # Emit signal for found file
+                        self.basename = os.path.basename(full_path)
                         self.process_file_found.emit(
-                            f"[{datetime.now()}] Processed file: {os.path.basename(full_path)}"
+                            f"[{datetime.now()}] Processed file: {self.basename}"
                         )
-    
+
                         # Run git diff
                         result = subprocess.run(
-                            ["git", "diff", str(full_path)],
-                            cwd=self.directory,
+                            ["git", "-C", self.directory, "diff", relative_path],
                             capture_output=True,
                             text=True,
                         )
-                    
-                        if result.returncode == 0 and result.stdout.strip() !='':
-                            print(f"Changes in {Path(full_path)}:\n{result.stdout.strip()}")
-                            self.data_store(str(full_path), result.stdout.strip())
+                        changes = result.stdout.strip()
+
+                        if result.returncode == 0 and changes:
+                            response = self.chain.invoke({"git_output": changes})
+                            message = response["text"].strip().replace("\n", " ")
+                            self.llm_message.emit(
+                                f"[{datetime.now()}] {self.basename} Message: {self.issue_key} {message}"
+                            )
+                            # Add and commit the file
+                            subprocess.run(
+                                ["git", "-C", self.directory, "add", relative_path],
+                                check=True,
+                            )
+                            subprocess.run(
+                                ["git", "-C", self.directory, "commit", "-m", message],
+                                check=True,
+                            )
+                            self.commited.emit(
+                                f"[{datetime.now()}] Committed {self.basename}"
+                            )
+                            self.messages.append(
+                                f"fileName: {self.basename} commitMessage: {message}"
+                            )
                         elif result.returncode != 0:
                             self.process_error.emit(
                                 f"Error running git diff: {result.stderr}"
                             )
                     except Exception as e:
-                        self.process_error.emit(f"An error occurred: {str(e)}")
-        print(datastore)
+                        self.process_error.emit(f"\nAn error occurred: {str(e)}\n")
+
+        self.update_or_append_llm_messages(self.messages)
         self.process_finished.emit()
+        self.end_time = time.time()
+        self.processing_time.emit(
+            f"Total processing time: {self.end_time - self.start_time:.4f} seconds"
+        )
+
+    def update_or_append_llm_messages(self, messages):
+        self.append_or_update_messages(self.get_json_path("dataStore.json"), messages)
+
+    def get_json_path(self, file_name: str):
+        # Determine root directory based on OS
+        if os.name == "nt":  # For Windows
+            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
+        else:  # For Unix-based systems (Linux/macOS)
+            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
+        json_path = Path(root_dir) / f"{file_name}"
+        return json_path
+
+    def prepare_llm(self) -> GoogleGenerativeAI:
+        try:
+            return GoogleGenerativeAI(
+                model=self.llm_model,
+                temperature=0,
+                api_key=self.api_key,
+            )
+        except Exception as e:
+            print(str(e))
+
+    def prepare_llm_chain(self) -> LLMChain:
+        memory = ConversationBufferMemory(
+            memory_key="chat_history", return_messages=True
+        )
+        with warnings.catch_warnings():
+            return LLMChain(
+                llm=self.prepare_llm(),
+                prompt=self.promp_template(message_length=self.message_length),
+                memory=memory,
+            )
+
+    def promp_template(self, message_length):
+
+        return PromptTemplate(
+            template=f"""
+                    You are a helpful assistant that helps programmers, coders, software engineers, and developers write intuitive 
+                    and concise git commit messages. The commit message should be in past tense and descriptive. Add more detail if necessary.
+                    But make sure it summarizes the commit message in {message_length} words and should not include a very detailed commit message .
+                    
+                    {{chat_history}}
+                    
+                    Given:
+                    - **Git Diff Output**: {{git_output}}
+                    
+                    Your task is to generate a clear and a meaningful git commit message based on the provided `git diff` output.
+                    
+                    The commit message should be:
+                    1. Simple  
+                    2. Intuitive  
+                    3. Meaningful  
+                    
+                    Assistant:""",
+            input_variables=["chat_history", "git_output"],
+        )
+
+    def append_or_update_messages(self, file_path: str, messages: list):
+        # Check if the file exists and is not empty
+        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+            # Load existing JSON data
+            with open(file_path, "r") as file:
+                try:
+                    data = json.load(file)
+                    # Ensure it's a dictionary, reset if not
+                    if not isinstance(data, dict):
+                        data = {}
+                except json.JSONDecodeError:
+                    data = {}  # Initialize as an empty dictionary if invalid JSON
+        else:
+            data = (
+                {}
+            )  # Initialize as an empty dictionary if file doesn't exist or is empty
+
+        # Update or add the 'apiKey'
+        data["messages"] = messages
+
+        # Write the updated data back to the file
+        with open(file_path, "w") as file:
+            json.dump(data, file, indent=4)
 
 
-    def data_store(self, file_path: str, changes: str):
-        datastore[file_path] = changes
-        return datastore
+class PullRequestProcessor(QThread):
+
+    # Signals to communicate with the main thread
+    llm_message = pyqtSignal(str)
+    process_error = pyqtSignal(str)
+    process_finished = pyqtSignal(str)
+    processing_time = pyqtSignal(str)
+
+    def __init__(self, api_key, llm_model):
+        super().__init__()
+        self.api_key = api_key
+        self.llm_model = llm_model
+        self.chain = self.prepare_llm_chain()
+
+    def run(self):
+        self.start_time = time.time()
+        try:
+
+            messages = self.get_item_by_key("messages", "dataStore.json")
+            response = self.chain.invoke({"commit_messages": messages})
+            message = response.get("text", "No response text found.")
+            self.llm_message.emit(message)
+            self.process_finished.emit("Done processing....")
+            self.end_time = time.time()
+            self.processing_time.emit(
+                f"Total processing time: {self.end_time-self.start_time:.4f} seconds"
+            )
+        except Exception as e:
+            self.process_error.emit(f"\nError during execution: {str(e)}\n")
+
+    def prepare_llm_chain(self) -> LLMChain:
+        memory = ConversationBufferMemory(
+            memory_key="chat_history", return_messages=True
+        )
+        with warnings.catch_warnings():
+            return LLMChain(
+                llm=self.prepare_llm(),
+                prompt=self.promp_template(),
+                memory=memory,
+            )
+
+    def prepare_llm(self) -> GoogleGenerativeAI:
+        try:
+            return GoogleGenerativeAI(
+                model=self.llm_model,
+                temperature=0,
+                api_key=self.api_key,
+            )
+        except Exception as e:
+            print(str(e))
+
+    def promp_template(self):
+        return PromptTemplate(
+            template=f"""
+                    You are a highly skilled assistant specializing in creating clear, concise, and meaningful git pull request messages. 
+                    Your task is to analyze the provided commit messages and any relevant prior context from the chat history to generate a cohesive pull request description.
+
+                    **Input Structure**:
+                    - `chat_history`: A summary of prior discussions or context relevant to the changes.
+                    - `commit_messages`: A list where each item is formatted as:
+                    `fileName: [file name] commitMessage: [commit message]`.
+
+                    **Requirements**:
+                    - Use **past tense** for all descriptions.
+                    - Ensure the pull request message is clear, descriptive, and meaningful.
+                    - Group related changes or updates for improved clarity.
+                    - Highlight the key contributions made in the commits.
+                    - Consider context from `chat_history` to ensure accuracy and relevance.
+
+                    **Input**:
+                    - `chat_history`: {{chat_history}}
+                    - `commit_messages`: {{commit_messages}} 
+
+                    **Instructions**:
+                    - Parse the `commit_messages` list.
+                    - Use the `chat_history` to enrich or clarify the pull request description where applicable.
+                    - Synthesize the input into a cohesive pull request message that is professional and structured.
+
+                    **Output Format**:
+                    ```
+                    - [Action or change description] for [file name(s)].
+                    - [Additional details or rationale, if necessary].
+                    - Grouped changes should appear as a single bullet point where applicable.
+                    ```
+
+                    **Example Input**:
+                    ```
+                    chat_history: "Discussed adding database configurations and new API endpoints."
+                    commit_messages: [
+                        "fileName: ecosystem.config.js commitMessage: Added database configuration to ecosystem.config.js.",
+                        "fileName: index.js commitMessage: Added API endpoints for single user GET, POST, and PUT requests."
+                    ]
+                    ```
+
+                    **Example Output**:
+                    ```
+                    - Added database configuration for deployment in `ecosystem.config.js`.
+                    - Implemented single-user API endpoints (GET, POST, and PUT) in `index.js`.
+                    - Changes align with previous discussions about enhancing deployment and API capabilities.
+                    ```
+
+                    Begin synthesizing the pull request message below:
+            """,
+            input_variables=["chat_history", "commit_messages"],
+        )
+
+    def get_json_path(self, file_name: str):
+        # Determine root directory based on OS
+        if os.name == "nt":  # For Windows
+            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
+        else:  # For Unix-based systems (Linux/macOS)
+            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
+        json_path = Path(root_dir) / f"{file_name}"
+        return json_path
+
+    def get_item_by_key(self, key: str, file_name: str):
+        with open(self.get_json_path(file_name), "r") as file:
+            try:
+                # Load JSON data
+                json_data = json.load(file)
+                if key in json_data:
+                    return json_data[key]
+                else:
+                    return None
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Error decoding JSON: {e}")
+
+
+class FileReader:
+
+    def get_file_content(self, file_name: str):
+        # Determine root directory based on OS
+        if os.name == "nt":  # For Windows
+            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
+        else:  # For Unix-based systems (Linux/macOS)
+            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
+
+        # Construct the file path
+        file_path = Path(root_dir) / file_name
+
+        # Read file content into a list if the file exists
+        if file_path.exists() and file_path.is_file():
+            with file_path.open("r", encoding="utf-8") as file:
+                content_list = [
+                    line.strip() for line in file
+                ]  # Stripping newline characters
+            return content_list
+        else:
+            raise FileNotFoundError(f"The file '{file_path}' does not exist.")
 
 
 class MainWindow(QMainWindow):
@@ -221,6 +503,9 @@ class MainWindow(QMainWindow):
         uic.loadUi("./views/main_window.ui", self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.icon = QIcon(self.resource_path("icon.ico"))
+        self.setWindowIcon(self.icon)
+        self.setWindowTitle("GitCommitBuddy")
         self.oldPosition = self.pos()
         self.create_program_directory()
         self.populateComboBoxes()
@@ -230,6 +515,7 @@ class MainWindow(QMainWindow):
         self.qtRectangle.moveCenter(self.centerPoint)
         self.move(self.qtRectangle.topLeft())
         self.dialog = SettingsDialog()
+        self.commitMessageLenghtEdit.setValidator(QIntValidator(5, 9999))
 
         self.btnClose.clicked.connect(self.close_app)
         self.btnMinimize.clicked.connect(self.showMinimized)
@@ -248,9 +534,10 @@ class MainWindow(QMainWindow):
 
         self.btnResetTextEdit.clicked.connect(self.clearContent)
         self.btnGenerateCommit.clicked.connect(self.process_directory_content)
+        self.btnGeneratePullRequest.clicked.connect(self.generate_pull_request_message)
 
         self.btnSaveProjectConfiguration.clicked.connect(self.saveProjectConfiguration)
-        self.setExtentionsFont()
+        self.setFont()
 
         self.projectsComboBox.currentIndexChanged.connect(self.on_combo_box_changed)
 
@@ -261,6 +548,9 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"{str(e)}")
 
+    def resource_path(self, relative_path):
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), relative_path))
+
     def check_git_installation(self):
         try:
             result = subprocess.run(
@@ -270,43 +560,121 @@ class MainWindow(QMainWindow):
         except subprocess.CalledProcessError:
             return "Path to git exe not found"
 
+    def check_internet(self, host="8.8.8.8", port=53, timeout=3):
+        """
+        Check for internet connection by attempting to connect to a host.
+        Defaults to Google's public DNS server (8.8.8.8) on port 53.
+        """
+        try:
+            socket.setdefaulttimeout(timeout)
+            socket.create_connection((host, port))
+            return True
+        except OSError:
+            return False
+
+    def pull_request_error(self, message):
+        self.pullTextEdit.setText(message)
+
+    def generate_pull_request_message(self):
+        try:
+            if self.check_internet():
+                self.pullTextEdit.clear()
+                selected_model = self.llmModels.currentText()
+                api_key = self.get_api_key(self.get_json_path("apiKey.json"))
+                llm_model = self.get_item_by_key(selected_model, "llmModels.json")
+                self.pullTextEdit.append(
+                    f"[{datetime.now()} ] Processing commit messages...\n"
+                )
+                if selected_model:
+                    self.pull_thread = PullRequestProcessor(api_key, llm_model)
+                    self.pull_thread.llm_message.connect(self.append_llm_pull_message)
+                    self.pull_thread.process_error.connect(self.pull_request_error)
+                    self.pull_thread.process_finished.connect(
+                        self.append_llm_pull_message
+                    )
+                    self.pull_thread.processing_time.connect(
+                        self.append_llm_pull_message
+                    )
+                    self.pull_thread.start()
+                else:
+                    self.pullTextEdit.setText(
+                        f"\n[{datetime.now()} ] No llm model selected...\n"
+                    )
+            else:
+                self.pullTextEdit.setText(
+                    f"\n[{datetime.now()} ] No internet connection...\n"
+                )
+        except Exception as e:
+            print(f"An error occured: {str(e)}")
+
     def process_directory_content(self):
         try:
             selected_item = self.projectsComboBox.currentText()
-            self.fileExtentionsTextEdit.clear()
-            self.textEdit.clear()
-            if selected_item:  # If the text is not empty
-                item = self.get_item_by_key(selected_item, "projects.json")
-                self.projectPath.setText(item["path"])
-                self.string_extensions = item["extensions"]
-                self.directory_content_processor(
-                    item["path"],
-                    [ext.strip() for ext in self.string_extensions.split(",")],
-                )
-                self.projectKey.setText(selected_item)
-                self.fileExtentionsTextEdit.append(self.string_extensions)
-                self.process_thread.quit()
+            selected_model = self.llmModels.currentText()
+
+            if self.check_internet():
+                self.fileExtentionsTextEdit.clear()
+                self.textEdit.clear()
+                if selected_item and selected_model:  # If the text is not empty
+                    item = self.get_item_by_key(selected_item, "projects.json")
+                    self.projectPath.setText(item["path"])
+                    self.string_extensions = item["extensions"]
+                    self.directory_content_processor(
+                        item["path"],
+                        [ext.strip() for ext in self.string_extensions.split(",")],
+                    )
+                    self.projectKey.setText(selected_item)
+                    self.fileExtentionsTextEdit.append(self.string_extensions)
+                    self.process_thread.quit()
+                else:
+                    self.textEdit.setText(
+                        f"[{datetime.now()} ] No project selected or model selected!"
+                    )
             else:
-                self.textEdit.setText("No project selected!")
+                self.textEdit.setText(f"[{datetime.now()} ] No internet connection.")
 
         except Exception as e:
             print(f"An exception occurred: {str(e)}")
 
     def directory_content_processor(self, directory, extensions):
         try:
+            selected_item = self.llmModels.currentText()
+            llm_model = self.get_item_by_key(selected_item, "llmModels.json")
+            message_length = self.commitMessageLenghtEdit.text()
+            issue_key = self.issueKeyLineEdit.text()
             if directory:
+                api_key = self.get_api_key(self.get_json_path("apiKey.json"))
                 self.textEdit.append(f"Processing directory content: {directory}\n")
+                self.append_llm_message(
+                    "Generating commit messages, might take sometime.\n"
+                )
                 # Initialize and start the file walker thread
-                self.process_thread = ProcessDirectoryContent(directory, extensions)
+                self.process_thread = ProcessDirectoryContent(
+                    directory,
+                    extensions,
+                    api_key,
+                    llm_model,
+                    message_length or 10,
+                    issue_key,
+                )
                 self.process_thread.process_file_found.connect(
                     self.append_processed_file
                 )
                 self.process_thread.process_finished.connect(self.processing_finished)
                 self.process_thread.process_error.connect(self.append_processed_file)
                 self.process_thread.git_installation.connect(self.append_processed_file)
+                self.process_thread.llm_message.connect(self.append_llm_message)
+                self.process_thread.commited.connect(self.append_llm_message)
+                self.process_thread.processing_time.connect(self.append_llm_message)
                 self.process_thread.start()
         except Exception as e:
             print(f"An error occured: {str(e)}")
+
+    def append_llm_pull_message(self, message):
+        self.pullTextEdit.append(message)
+
+    def append_llm_message(self, message):
+        self.textEdit.append(message)
 
     def append_processed_file(self, file_path):
         # Append the file path to the text area
@@ -397,7 +765,7 @@ class MainWindow(QMainWindow):
         else:
             return None  # If the file doesn't exist or is empty
 
-    def setExtentionsFont(self):
+    def setFont(self):
         font = QFont()
         font.setFamily("Baskerville Old Face")
         font.setPointSize(15)  # Set font size to 14
@@ -408,6 +776,8 @@ class MainWindow(QMainWindow):
         font1.setPointSize(11)
         self.textEdit.setFont(font1)
         self.textEdit.clear()
+        self.pullTextEdit.setFont(font1)
+        self.pullTextEdit.clear()
 
     def mousePressEvent(self, event):
         self.oldPosition = event.globalPos()
@@ -469,6 +839,9 @@ class MainWindow(QMainWindow):
             data_store = os.path.join(root_dir, "dataStore.json")
             data_store = Path(data_store)
             data_store.touch(exist_ok=True)
+            folders_to_skip = os.path.join(root_dir, "foldersToSkip.txt")
+            folders_to_skip = Path(folders_to_skip)
+            folders_to_skip.touch(exist_ok=True)
 
     def get_json_path(self, file_name: str):
         # Determine root directory based on OS
@@ -558,6 +931,7 @@ class MainWindow(QMainWindow):
             selected_item = self.projectsComboBox.currentText()
             item = self.get_item_by_key(selected_item, "projects.json")
             self.projectPath.setText(item["path"])
+            self.projectPathPullRequest.setText(item["path"])
             self.string_extensions = item["extensions"]
             self.start_walking(
                 item["path"], [ext.strip() for ext in self.string_extensions.split(",")]
