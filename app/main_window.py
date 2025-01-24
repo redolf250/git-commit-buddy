@@ -154,9 +154,12 @@ class FileWalkerThread(QThread):
                     if file.endswith(tuple(self.extensions)):  # Check file extensions
                         full_path = root_path / file  # Construct the full file path
                         relative_path = os.path.relpath(full_path, self.directory)
-                        self.file_found.emit(
-                            relative_path
-                        )  # Emit the full file path as a string
+                        status = subprocess.run(["git", "status", "--short", relative_path], cwd=self.directory, capture_output=True, text=True)
+                        if status.stdout.strip():  # Check if there is any output
+                            self.file_found.emit(f"[Status {status.stdout.split()[0]} ] : {relative_path}")  # Emit the full file path as a string
+                        else:
+                            self.file_found.emit(f"[No changes ] : {relative_path}")  # Emit the full file path as a string
+                        
             self.finished.emit()
         except Exception as e:
             print(f"An error occured: {str(e)}")
