@@ -1,2 +1,3 @@
 script.py
 __pycache__
+./views/main_window_ui.py
