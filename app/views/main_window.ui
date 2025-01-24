@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1464</width>
-    <height>862</height>
+    <width>1468</width>
+    <height>872</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -572,6 +572,12 @@ QPushButton:hover{
                  <height>800</height>
                 </size>
                </property>
+               <property name="font">
+                <font>
+                 <family>Baskerville Old Face</family>
+                 <pointsize>11</pointsize>
+                </font>
+               </property>
                <property name="currentIndex">
                 <number>0</number>
                </property>
@@ -969,7 +975,7 @@ QPushButton:pressed{
                      <bool>true</bool>
                     </property>
                    </widget>
-                   <widget class="QPushButton" name="btnClearMemory">
+                   <widget class="QPushButton" name="btnStage">
                     <property name="geometry">
                      <rect>
                       <x>10</x>
@@ -1001,11 +1007,11 @@ QPushButton:pressed{
 }</string>
                     </property>
                     <property name="text">
-                     <string>Memory</string>
+                     <string>Stage Files</string>
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>../resources/assert/repeat.svg</normaloff>../resources/assert/repeat.svg</iconset>
+                      <normaloff>../resources/assert/file.svg</normaloff>../resources/assert/file.svg</iconset>
                     </property>
                     <property name="flat">
                      <bool>true</bool>
@@ -1161,7 +1167,169 @@ p, li { white-space: pre-wrap; }
                  </item>
                 </layout>
                </widget>
-               <widget class="QWidget" name="pullRequestPage"/>
+               <widget class="QWidget" name="pullRequestPage">
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QFrame" name="frame_5">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>60</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>65</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Plain</enum>
+                   </property>
+                   <widget class="QLabel" name="projectPathPullRequest">
+                    <property name="geometry">
+                     <rect>
+                      <x>230</x>
+                      <y>10</y>
+                      <width>1171</width>
+                      <height>50</height>
+                     </rect>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>50</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>11</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(66, 66, 66);
+padding-left: 2px;
+border-radius: 5px;</string>
+                    </property>
+                    <property name="text">
+                     <string>Project Path</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnGeneratePullRequest">
+                    <property name="geometry">
+                     <rect>
+                      <x>20</x>
+                      <y>10</y>
+                      <width>201</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QPushButton:hover{
+	border-radius: 10px;
+}
+
+QPushButton:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Generate </string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/send.svg</normaloff>../resources/assert/send.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="flat">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="frame_6">
+                   <property name="font">
+                    <font>
+                     <family>Baskerville Old Face</family>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Plain</enum>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_8">
+                    <item>
+                     <widget class="QTextEdit" name="pullTextEdit">
+                      <property name="font">
+                       <font>
+                        <family>Baskerville Old Face</family>
+                        <pointsize>14</pointsize>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">color: rgb(255, 255, 255);</string>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
                <widget class="QWidget" name="settingsPage"/>
                <widget class="QWidget" name="homePage"/>
               </widget>
