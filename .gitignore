@@ -5,3 +5,4 @@ build/
 dist/
 .spec
 ./*.spec
+./setup.py
