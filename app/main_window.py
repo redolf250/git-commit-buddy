@@ -134,6 +134,7 @@ class FileWalkerThread(QThread):
     # Define a signal to send file names to the main thread
     file_found = pyqtSignal(str)
     finished = pyqtSignal()
+    processing_time = pyqtSignal(str)
 
     def __init__(
         self,
@@ -160,6 +161,7 @@ class FileWalkerThread(QThread):
 
     def run(self):
         try:
+            self.start_time = time.time()
             # Walk through the directory and find files with the specified extensions
             for root, dirs, files in os.walk(self.directory):
                 root_path = Path(root)
@@ -184,6 +186,10 @@ class FileWalkerThread(QThread):
                             )  # Emit the full file path as a string
 
             self.finished.emit()
+            self.end_time = time.time()
+            self.processing_time.emit(
+                f"\nTotal processing time: {self.end_time - self.start_time:.4f} seconds\n"
+            )
         except Exception as e:
             print(f"An error occured: {str(e)}")
             raise e
@@ -790,6 +796,7 @@ class MainWindow(QMainWindow):
                 self.thread = FileWalkerThread(directory, extensions)
                 self.thread.file_found.connect(self.append_file)
                 self.thread.finished.connect(self.scan_finished)
+                self.thread.processing_time.connect(self.append_file)
                 self.thread.start()
         except Exception as e:
             print(f"An error occured: {str(e)}")
