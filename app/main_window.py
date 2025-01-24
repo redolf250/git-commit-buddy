@@ -182,7 +182,8 @@ class FileWalkerThread(QThread):
                             capture_output=True,
                             text=True,
                         )
-                        if status.stdout.strip():  # Check if there is any output
+                        if status.stdout.strip():
+                            # Check if there is any output
                             self.file_found.emit(
                                 f"[ {self.git_status_codes.get(status.stdout.split()[0])} ] : {relative_path}"
                             )  # Emit the full file path as a string
