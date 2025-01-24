@@ -355,8 +355,9 @@ class ProcessDirectoryContent(QThread):
             root_dir = os.path.join(os.sep, "var", "lib")
         root_dir = os.path.join(root_dir, "GitCommitBuddy")
         
-        # Create directory if it doesn't exist
+                # Create directory if it doesn't exist
         Path(root_dir).mkdir(parents=True, exist_ok=True)
+        return Path(root_dir) / file_name
 
     def prepare_llm(self) -> GoogleGenerativeAI:
         try:
