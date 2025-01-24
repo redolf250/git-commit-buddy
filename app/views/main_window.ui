@@ -917,11 +917,11 @@ QPushButton:pressed{
 }</string>
                     </property>
                     <property name="text">
-                     <string>Generate</string>
+                     <string>Process</string>
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>../resources/assert/send.svg</normaloff>../resources/assert/send.svg</iconset>
+                      <normaloff>../resources/assert/sliders.svg</normaloff>../resources/assert/sliders.svg</iconset>
                     </property>
                     <property name="iconSize">
                      <size>
@@ -970,48 +970,6 @@ QPushButton:pressed{
                     <property name="icon">
                      <iconset>
                       <normaloff>../resources/assert/minus.svg</normaloff>../resources/assert/minus.svg</iconset>
-                    </property>
-                    <property name="flat">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                   <widget class="QPushButton" name="btnStage">
-                    <property name="geometry">
-                     <rect>
-                      <x>10</x>
-                      <y>290</y>
-                      <width>171</width>
-                      <height>51</height>
-                     </rect>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <family>Baskerville Old Face</family>
-                      <pointsize>12</pointsize>
-                     </font>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">QPushButton{
-	color: rgb(255, 255, 255);
-	background-color: rgb(66, 66, 66);
-	border:none;
-	border-radius: 5px;
-}
-
-QPushButton:hover{
-	border-radius: 10px;
-}
-
-QPushButton:pressed{
-	border: 2px solid rgb(255,255,255);	
-}</string>
-                    </property>
-                    <property name="text">
-                     <string>Stage Files</string>
-                    </property>
-                    <property name="icon">
-                     <iconset>
-                      <normaloff>../resources/assert/file.svg</normaloff>../resources/assert/file.svg</iconset>
                     </property>
                     <property name="flat">
                      <bool>true</bool>
@@ -1094,6 +1052,79 @@ border: 2px solid rgb(255,255,255);
                      <bool>true</bool>
                     </property>
                    </widget>
+                   <widget class="QLabel" name="label_3">
+                    <property name="geometry">
+                     <rect>
+                      <x>10</x>
+                      <y>290</y>
+                      <width>171</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLabel{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}
+
+QLabel:hover{
+	border-radius: 10px;
+}
+
+QLabel:pressed{
+	border: 2px solid rgb(255,255,255);	
+}</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                   <widget class="QRadioButton" name="toggleTracking">
+                    <property name="geometry">
+                     <rect>
+                      <x>20</x>
+                      <y>290</y>
+                      <width>151</width>
+                      <height>51</height>
+                     </rect>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <family>Baskerville Old Face</family>
+                      <pointsize>12</pointsize>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QRadioButton{
+	color: rgb(255, 255, 255);
+	background-color: rgb(66, 66, 66);
+	border:none;
+	border-radius: 5px;
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Track Files</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>../resources/assert/file.svg</normaloff>../resources/assert/file.svg</iconset>
+                    </property>
+                   </widget>
+                   <zorder>label_3</zorder>
+                   <zorder>issueKeyLineEdit</zorder>
+                   <zorder>projectsComboBox</zorder>
+                   <zorder>commitMessageLenghtEdit</zorder>
+                   <zorder>btnBrowse</zorder>
+                   <zorder>fileExtentionsTextEdit</zorder>
+                   <zorder>btnSaveProjectConfiguration</zorder>
+                   <zorder>projectKey</zorder>
+                   <zorder>btnGenerateCommit</zorder>
+                   <zorder>btnRemoveProject</zorder>
+                   <zorder>btnResetTextEdit</zorder>
+                   <zorder>llmModels</zorder>
+                   <zorder>toggleTracking</zorder>
                   </widget>
                  </item>
                  <item>
