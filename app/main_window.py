@@ -135,7 +135,11 @@ class FileWalkerThread(QThread):
     file_found = pyqtSignal(str)
     finished = pyqtSignal()
 
-    def __init__(self, directory, extensions):
+    def __init__(
+        self,
+        directory,
+        extensions,
+    ):
         super().__init__()
         self.directory = Path(
             directory
@@ -143,6 +147,16 @@ class FileWalkerThread(QThread):
         self.extensions = extensions  # List or tuple of valid file extensions
         self.file_reader = FileReader()
         self.content = self.file_reader.get_file_content("foldersToSkip.txt")
+        self.git_status_codes = {
+            "M": "Modified",
+            "A": "Staged",
+            "??": "Untracked",
+            " ": "Untracked",
+            "D": "Deleted",
+            "R": "Renamed",
+            "C": "Copied",
+            "UU": "Conflicts.",
+        }
 
     def run(self):
         try:
@@ -154,12 +168,21 @@ class FileWalkerThread(QThread):
                     if file.endswith(tuple(self.extensions)):  # Check file extensions
                         full_path = root_path / file  # Construct the full file path
                         relative_path = os.path.relpath(full_path, self.directory)
-                        status = subprocess.run(["git", "status", "--short", relative_path], cwd=self.directory, capture_output=True, text=True)
+                        status = subprocess.run(
+                            ["git", "status", "--short", relative_path],
+                            cwd=self.directory,
+                            capture_output=True,
+                            text=True,
+                        )
                         if status.stdout.strip():  # Check if there is any output
-                            self.file_found.emit(f"[Status {status.stdout.split()[0]} ] : {relative_path}")  # Emit the full file path as a string
+                            self.file_found.emit(
+                                f"[ {self.git_status_codes.get(status.stdout.split()[0])} ] : {relative_path}"
+                            )  # Emit the full file path as a string
                         else:
-                            self.file_found.emit(f"[No changes ] : {relative_path}")  # Emit the full file path as a string
-                        
+                            self.file_found.emit(
+                                f"[ UnModified ] : {relative_path}"
+                            )  # Emit the full file path as a string
+
             self.finished.emit()
         except Exception as e:
             print(f"An error occured: {str(e)}")
@@ -177,13 +200,21 @@ class ProcessDirectoryContent(QThread):
     commited = pyqtSignal(str)
 
     def __init__(
-        self, directory, extensions, api_key, llm_model, message_length, issue_key
+        self,
+        directory,
+        extensions,
+        api_key,
+        llm_model,
+        message_length,
+        issue_key,
+        is_staging_enable,
     ):
         super().__init__()
         self.api_key = api_key
         self.llm_model = llm_model
         self.message_length = message_length
         self.issue_key = issue_key
+        self.is_staging_enable = is_staging_enable
         self.directory = Path(directory)  # Convert to pathlib.Path
         self.extensions = [ext.lower() for ext in extensions]  # Normalize extensions
         self.messages: list = []
@@ -223,6 +254,40 @@ class ProcessDirectoryContent(QThread):
                         self.process_file_found.emit(
                             f"[{datetime.now()}] Processed file: {self.basename}"
                         )
+
+                        if self.is_staging_enable:
+                            status = subprocess.run(
+                                ["git", "status", "--short", relative_path],
+                                cwd=self.directory,
+                                capture_output=True,
+                                text=True,
+                            )
+                            # Extract the status part
+                            output = status.stdout.strip()
+                            if output:
+                                file_status = output[
+                                    :2
+                                ]  # Get the first two characters (status code)
+                                if file_status == "??" or file_status == " ":
+                                    subprocess.run(
+                                        ["git", "add", relative_path],
+                                        cwd=self.directory,
+                                        check=True,
+                                    )
+                                    subprocess.run(
+                                        [
+                                            "git",
+                                            "commit",
+                                            "-m",
+                                            "Initial commit",
+                                            relative_path,
+                                        ],
+                                        cwd=self.directory,
+                                        check=True,
+                                    )
+                                    self.process_file_found.emit(
+                                        f"[{datetime.now()} ] File set for tracking: {self.basename}"
+                                    )
 
                         # Run git diff
                         result = subprocess.run(
@@ -313,7 +378,8 @@ class ProcessDirectoryContent(QThread):
                     Given:
                     - **Git Diff Output**: {{git_output}}
                     
-                    Your task is to generate a clear and a meaningful git commit message based on the provided `git diff` output.
+                    Your task is to generate a clear and a meaningful git commit message based on the provided `git diff` output and
+                    if the `git diff` is empty you can give this `Initial commit` as the commit message.
                     
                     The commit message should be:
                     1. Simple  
@@ -645,6 +711,7 @@ class MainWindow(QMainWindow):
             llm_model = self.get_item_by_key(selected_item, "llmModels.json")
             message_length = self.commitMessageLenghtEdit.text()
             issue_key = self.issueKeyLineEdit.text()
+            toggle_tracking = self.toggleTracking.isChecked()
             if directory:
                 api_key = self.get_api_key(self.get_json_path("apiKey.json"))
                 self.textEdit.append(f"Processing directory content: {directory}\n")
@@ -653,12 +720,13 @@ class MainWindow(QMainWindow):
                 )
                 # Initialize and start the file walker thread
                 self.process_thread = ProcessDirectoryContent(
-                    directory,
-                    extensions,
-                    api_key,
-                    llm_model,
-                    message_length or 10,
-                    issue_key,
+                    directory=directory,
+                    extensions=extensions,
+                    api_key=api_key,
+                    llm_model=llm_model,
+                    message_length=message_length or 10,
+                    issue_key=issue_key,
+                    is_staging_enable=toggle_tracking,
                 )
                 self.process_thread.process_file_found.connect(
                     self.append_processed_file
