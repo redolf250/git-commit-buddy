@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import socket
 import time
@@ -25,7 +26,11 @@ from langchain_google_genai import GoogleGenerativeAI
 class SettingsDialog(QDialog):
     def __init__(self):
         super().__init__()
-        uic.loadUi("./views/api_key_dialog.ui", self)
+        if getattr(sys, 'frozen', False):
+            ui_path = os.path.join(sys._MEIPASS, 'views', 'api_key_dialog.ui')
+        else:
+            ui_path = './views/api_key_dialog.ui'  # Normal development mode
+        uic.loadUi(ui_path, self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowModality(Qt.ApplicationModal)
@@ -68,13 +73,14 @@ class SettingsDialog(QDialog):
         )
 
     def get_json_path(self, file_name: str):
-        # Determine root directory based on OS
-        if os.name == "nt":  # For Windows
-            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
-        else:  # For Unix-based systems (Linux/macOS)
-            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
-        json_path = Path(root_dir) / f"{file_name}"
-        return json_path
+        if os.name == "nt":
+            root_dir = os.getenv("ProgramData", "C:\\ProgramData")
+        else:
+            root_dir = os.path.join(os.sep, "var", "lib")
+        root_dir = os.path.join(root_dir, "GitCommitBuddy")
+        
+        # Create directory if it doesn't exist
+        Path(root_dir).mkdir(parents=True, exist_ok=True)
 
     def append_or_update_api_key(self, file_path: str, api_key: str):
         """
@@ -342,13 +348,14 @@ class ProcessDirectoryContent(QThread):
         self.append_or_update_messages(self.get_json_path("dataStore.json"), messages)
 
     def get_json_path(self, file_name: str):
-        # Determine root directory based on OS
-        if os.name == "nt":  # For Windows
-            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
-        else:  # For Unix-based systems (Linux/macOS)
-            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
-        json_path = Path(root_dir) / f"{file_name}"
-        return json_path
+        if os.name == "nt":
+            root_dir = os.getenv("ProgramData", "C:\\ProgramData")
+        else:
+            root_dir = os.path.join(os.sep, "var", "lib")
+        root_dir = os.path.join(root_dir, "GitCommitBuddy")
+        
+        # Create directory if it doesn't exist
+        Path(root_dir).mkdir(parents=True, exist_ok=True)
 
     def prepare_llm(self) -> GoogleGenerativeAI:
         try:
@@ -530,13 +537,14 @@ class PullRequestProcessor(QThread):
         )
 
     def get_json_path(self, file_name: str):
-        # Determine root directory based on OS
-        if os.name == "nt":  # For Windows
-            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
-        else:  # For Unix-based systems (Linux/macOS)
-            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
-        json_path = Path(root_dir) / f"{file_name}"
-        return json_path
+        if os.name == "nt":
+            root_dir = os.getenv("ProgramData", "C:\\ProgramData")
+        else:
+            root_dir = os.path.join(os.sep, "var", "lib")
+        root_dir = os.path.join(root_dir, "GitCommitBuddy")
+        
+        # Create directory if it doesn't exist
+        Path(root_dir).mkdir(parents=True, exist_ok=True)
 
     def get_item_by_key(self, key: str, file_name: str):
         with open(self.get_json_path(file_name), "r") as file:
@@ -577,7 +585,11 @@ class FileReader:
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("./views/main_window.ui", self)
+        if getattr(sys, 'frozen', False):
+            ui_path = os.path.join(sys._MEIPASS, 'views', 'main_window.ui')
+        else:
+            ui_path = './views/main_window.ui'
+        uic.loadUi(ui_path, self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.icon = QIcon(self.resource_path("icon.ico"))
@@ -905,10 +917,11 @@ class MainWindow(QMainWindow):
         return os.path.basename(path)
 
     def create_program_directory(self):
-        if os.name == "nt":  # For Windows
-            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
-        else:  # For Unix-based systems (Linux/macOS)
-            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
+        if os.name == "nt":
+            root_dir = os.getenv("ProgramData", "C:\\ProgramData")
+        else:
+            root_dir = os.path.join(os.sep, "var", "lib")
+        root_dir = os.path.join(root_dir, "GitCommitBuddy")
         if not os.path.exists(root_dir):
             os.makedirs(root_dir)
             json_path = os.path.join(root_dir, "projects.json")
@@ -928,13 +941,16 @@ class MainWindow(QMainWindow):
             folders_to_skip.touch(exist_ok=True)
 
     def get_json_path(self, file_name: str):
-        # Determine root directory based on OS
-        if os.name == "nt":  # For Windows
-            root_dir = os.path.join("C:", "ProgramData", "GitCommitBuddy")
-        else:  # For Unix-based systems (Linux/macOS)
-            root_dir = os.path.join(os.sep, "ProgramData", "GitCommitBuddy")
-        json_path = Path(root_dir) / f"{file_name}"
-        return json_path
+        if os.name == "nt":
+            root_dir = os.getenv("ProgramData", "C:\\ProgramData")
+        else:
+            root_dir = os.path.join(os.sep, "var", "lib")
+        root_dir = os.path.join(root_dir, "GitCommitBuddy")
+        
+        # Create directory if it doesn't exist
+        Path(root_dir).mkdir(parents=True, exist_ok=True)
+        
+        return Path(root_dir) / file_name
 
     def is_git_repository(self, folder_path):
         """
