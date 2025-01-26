@@ -1,6 +1,3 @@
 {
-    "messages": [
-        "fileName: requirements.txt commitMessage: Added PyQt5, langchain, and langchain-google-genai packages.",
-        "fileName: main_window.py commitMessage: Refactored file path handling for improved resource management."
-    ]
+    "messages": []
 }
