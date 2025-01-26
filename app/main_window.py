@@ -540,7 +540,7 @@ class PullRequestProcessor(QThread):
                         ```
 
                         **Example Output**:
-                        ```markdown
+                        
                         ## Pull Request Summary
 
                         ### New Features
@@ -553,7 +553,7 @@ class PullRequestProcessor(QThread):
                         **Context**
                         - These changes align with previous discussions about enhancing deployment and API capabilities.
                         - Refactoring was necessary to ensure maintainability and performance improvements.
-                        ```
+                        
 
                         Begin synthesizing the pull request message below:
                 """,
