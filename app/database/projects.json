@@ -10,5 +10,9 @@
     "Commons": {
         "path": "D:/Python/learning/Commons",
         "extensions": "py,txt,doc,json"
+    },
+    "micro-finance": {
+        "path": "D:/React stuffs/works/micro-finance",
+        "extensions": "js,ts,json,ejs,css,gitignore"
     }
 }
