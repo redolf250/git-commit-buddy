@@ -291,7 +291,7 @@ class ProcessDirectoryContent(QThread):
 
                                         # Commit the file with the LLM-generated message
                                         subprocess.run(
-                                            ["git", "-C", self.directory, "commit", "-m", generated_message],
+                                            ["git", "-C", self.directory, "commit", "-m", f'{self.issue_key} {generated_message}'],
                                             check=True,
                                         )
                                         self.process_file_found.emit(
@@ -300,7 +300,7 @@ class ProcessDirectoryContent(QThread):
                                     else:
                                         # No diff changes, use the default "Initial commit" message
                                         subprocess.run(
-                                            ["git", "-C", self.directory, "commit", "-m", "Initial commit", relative_path],
+                                            ["git", "-C", self.directory, "commit", "-m", f"{self.issue_key} Initial commit", relative_path],
                                             check=True,
                                         )
                                         self.process_file_found.emit(
@@ -327,7 +327,7 @@ class ProcessDirectoryContent(QThread):
                                 check=True,
                             )
                             subprocess.run(
-                                ["git", "-C", self.directory, "commit", "-m", message],
+                                ["git", "-C", self.directory, "commit", "-m", f'{self.issue_key} {message}'],
                                 check=True,
                             )
                             self.committed.emit(
