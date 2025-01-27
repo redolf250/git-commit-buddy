@@ -10,6 +10,8 @@ bin
 Bin
 targets
 target
+build
+dist
 tarballs
 test-results
 autom4te.cache
