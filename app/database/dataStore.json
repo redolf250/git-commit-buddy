@@ -1,24 +1,6 @@
 {
     "messages": [
-        "fileName: CustomerController.ts commitMessage: Added CurrentUser type and populated branchId and officerId to request body.",
-        "fileName: GuarantorController.ts commitMessage: Added base-x encoding for guarantor IDs and included encoded ID in response.",
-        "fileName: OfficerController.ts commitMessage: Implemented base-x encoding for officer IDs and updated related methods.",
-        "fileName: LoanApplicationService.ts commitMessage: Added CurrentUser type; populated branchId and officerId.",
-        "fileName: TransactionsHandlerService.ts commitMessage: Implemented base-x encoding for IDs in TransactionsHandlerService.",
-        "fileName: userAccounts.ejs commitMessage: Adjusted column widths and removed user account detail link.",
-        "fileName: addCustomerForm.ejs commitMessage: Updated customer registration form and redirect.",
-        "fileName: customer.ejs commitMessage: Improved customer view: added business sector modal and styling.",
-        "fileName: updateCustomerForm.ejs commitMessage: Updated customer details view and redirect URLs.",
-        "fileName: viewCustomerDetails.ejs commitMessage: Updated customer details view: improved styling and removed redundant elements.",
-        "fileName: addGuarantorForm.ejs commitMessage: Updated guarantor registration form and redirect URLs.",
-        "fileName: updateGuarantorForm.ejs commitMessage: Updated guarantor form: added ID type field and improved redirect.",
-        "fileName: assessments.ejs commitMessage: Corrected loan assessment URL in individual assessments view.",
-        "fileName: viewLoanAwaitAssessment.ejs commitMessage: Updated loan assessment view and disbursement logic.",
-        "fileName: addOfficerForm.ejs commitMessage: Updated officer registration form and redirect URLs.",
-        "fileName: officers.ejs commitMessage: Updated officer view: added role assignment modal and improved alerts.",
-        "fileName: updateOfficerForm.ejs commitMessage: Updated officer details view: improved redirect logic for admins and officers.",
-        "fileName: viewOfficerDetails.ejs commitMessage: Updated officer details view: removed redundant elements and improved styling.",
-        "fileName: viewPayment.ejs commitMessage: Updated payment approval logic for branch managers.",
-        "fileName: manage.ejs commitMessage: Updated officer profile view: improved styling and removed redundant elements."
+        "fileName: main_window.py commitMessage: Updated pull request summary markdown formatting.",
+        "fileName: dataStore.json commitMessage: Updated dataStore.json: added commit messages."
     ]
 }
