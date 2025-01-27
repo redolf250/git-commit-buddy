@@ -1,11 +1,17 @@
 .idea
+.gradle
+gradle
+.mvn
 .vs
+.vscode
 obj
 Obj
 bin
 Bin
 targets
 target
+build
+dist
 tarballs
 test-results
 autom4te.cache
