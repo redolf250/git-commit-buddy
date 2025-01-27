@@ -1,0 +1,18 @@
+{
+    "BizBoard": {
+        "path": "D:/CSharp/Projects/Biz/BizBoard",
+        "extensions": "json,cs,cshtml,js,css"
+    },
+    "git-commit-buddy": {
+        "path": "D:/Python/learning/git-commit-buddy",
+        "extensions": "py,json,txt,gitignore"
+    },
+    "Commons": {
+        "path": "D:/Python/learning/Commons",
+        "extensions": "py,txt,doc,json"
+    },
+    "micro-finance": {
+        "path": "D:/React stuffs/works/micro-finance",
+        "extensions": "js,ts,json,ejs,css,gitignore"
+    }
+}
