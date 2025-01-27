@@ -127,8 +127,24 @@ Example: `js,ts,css,json`.
 ---
 
 ## Screenshots 📸  
-*(Add images/screenshots here for better clarity)*  
 
+### Homepage and commits generating page
+![Commits Page](https://github.com/redolf250/git-commit-buddy/blob/dev/redolf/images/home.png)
+
+### Sample commits made by the assistant
+![Sample Commits](https://github.com/redolf250/git-commit-buddy/blob/dev/redolf/images/samplecommits.png)
+
+### Pull request generating page
+![Sample Commits](https://github.com/redolf250/git-commit-buddy/blob/dev/redolf/images/pullpage.png)
+
+### Sample pull request content based on the commits made by the assistant
+![Sample Commits](https://github.com/redolf250/git-commit-buddy/blob/dev/redolf/images/pullmesage.png)
+
+### Sample pull request content rendered on GitHub 
+![Sample Commits](https://github.com/redolf250/git-commit-buddy/blob/dev/redolf/images/gitpull.png)
+
+### Setting page
+![Sample Commits](https://github.com/redolf250/git-commit-buddy/blob/dev/redolf/images/settings.png)
 ---
 
 ### Contributions 🤝  
