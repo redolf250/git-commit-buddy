@@ -1,7 +1,8 @@
 import os
+import sys
 import json
-import socket
 import time
+import socket
 import warnings
 import subprocess
 from PyQt5 import uic
@@ -25,7 +26,11 @@ from langchain_google_genai import GoogleGenerativeAI
 class SettingsDialog(QDialog):
     def __init__(self):
         super().__init__()
-        uic.loadUi("./views/api_key_dialog.ui", self)
+        if getattr(sys, 'frozen', False):
+            ui_path = os.path.join(sys._MEIPASS, 'views', 'api_key_dialog.ui')
+        else:
+            ui_path = './views/api_key_dialog.ui'  # Normal development mode
+        uic.loadUi(ui_path, self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowModality(Qt.ApplicationModal)
@@ -592,7 +597,11 @@ class FileReader:
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("./views/main_window.ui", self)
+        if getattr(sys, 'frozen', False):
+            ui_path = os.path.join(sys._MEIPASS, 'views', 'main_window.ui')
+        else:
+            ui_path = './views/main_window.ui'  # Normal development mode
+        uic.loadUi(ui_path, self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.icon = QIcon(self.resource_path("icon.ico"))
