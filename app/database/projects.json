@@ -14,5 +14,9 @@
     "micro-finance": {
         "path": "D:/React stuffs/works/micro-finance",
         "extensions": "js,ts,json,ejs,css,gitignore"
+    },
+    "commit-buddy": {
+        "path": "D:/commit-buddy",
+        "extensions": "py,json,txt,gitignore"
     }
 }
