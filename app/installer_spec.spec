@@ -4,10 +4,11 @@ block_cipher = None
 
 # Include the resources directory and other files
 datas = [
-    ('D:/commit-buddy/app/*.txt', '.'),
     ('D:/commit-buddy/app/icon.ico', '.'),
     ('D:/commit-buddy/app/resources/assert/', 'resources/assert/'),
     ('./views/*.ui', 'views')
+    ('D:/commit-buddy/app/database/*.json', 'database'),
+    ('D:/commit-buddy/app/database/*.txt', 'database')
 ]
 
 a = Analysis(

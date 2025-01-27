@@ -430,6 +430,7 @@ class ProcessDirectoryContent(QThread):
 
     def resource_path(self, relative_path):
         return os.path.abspath(os.path.join(os.path.dirname(__file__), relative_path))
+ 
     
 class PullRequestProcessor(QThread):
 
