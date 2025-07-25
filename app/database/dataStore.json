@@ -42,4 +42,5 @@
         "fileName: authorization.ejs commitMessage: Updated authorization view with new height value.",
         "fileName: invitations.ejs commitMessage: \"Updated invitation removal button functionality in manage invitations view.\""
     ]
+    "messages": []
 }
