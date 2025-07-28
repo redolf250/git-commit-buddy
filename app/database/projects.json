@@ -1,18 +1,2 @@
 {
-    "node-demo-deploy": {
-        "path": "D:/Projects/node-demo-deploy",
-        "extensions": "js,css,html,ejs,ts"
-    },
-    "trade-sphere": {
-        "path": "D:/New folder/trade-sphere",
-        "extensions": "js,css,html,ejs,ts,json,hbs"
-    },
-    "commit-buddy": {
-        "path": "D:/commit-buddy",
-        "extensions": "py,json,ui,spec"
-    },
-    "GLMIS.Admin.Mvc": {
-        "path": "D:/Projects/GLMIS/GLMIS.Admin.Mvc",
-        "extensions": "cs,html,cshtml"
-    }
 }
